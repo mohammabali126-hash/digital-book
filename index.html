@@ -1,0 +1,863 @@
+```html
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Digital Book</title>
+
+  <style>
+    :root{
+      --purple:#7c3aed;
+      --violet:#a855f7;
+      --yellow:#6303b2;
+      --background:#090714;
+      --panel:rgba(255,255,255,.10);
+      --border:rgba(255,255,255,.22);
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html,
+    body{
+      width:100%;
+      height:100%;
+    }
+
+    body{
+      overflow:hidden;
+      font-family:Arial,"Segoe UI",Tahoma,sans-serif;
+
+      background:
+        radial-gradient(
+          ellipse 75% 55% at 15% 10%,
+          rgba(159,76,242,.565),
+          transparent 65%
+        ),
+        radial-gradient(
+          ellipse 70% 55% at 88% 18%,
+          rgba(178,105,255,.18),
+          transparent 68%
+        ),
+        radial-gradient(
+          ellipse 60% 45% at 82% 100%,
+          rgba(255,215,70,.16),
+          transparent 65%
+        ),
+        linear-gradient(
+          135deg,
+          #f3efff 0%,
+          #eee9ff 35%,
+          #f8f5ff 68%,
+          #fff8df 100%
+        );
+
+      color:white;
+    }
+
+    #app{
+      width:100%;
+      height:100%;
+
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+
+      gap:14px;
+      padding:14px;
+    }
+
+    .book-wrap{
+      width:min(1250px,99vw);
+      height:min(78vh,760px);
+
+      position:relative;
+    }
+
+    .book{
+      width:100%;
+      height:100%;
+
+      position:relative;
+      overflow:hidden;
+
+      background:#fff;
+
+      border:1px solid rgba(255,255,255,.8);
+      border-radius:10px;
+
+      box-shadow:
+        0 24px 70px rgba(0,0,0,.45),
+        0 0 45px rgba(124,58,237,.18);
+
+      touch-action:pan-y;
+    }
+
+    .page{
+      position:absolute;
+      inset:0;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      background:#fff;
+
+      user-select:none;
+
+      will-change:transform,opacity;
+    }
+
+    .page-inner{
+      width:100%;
+      height:100%;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      padding:1px;
+      overflow:hidden;
+    }
+
+    .media-page{
+      width:100%;
+      height:100%;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      overflow:hidden;
+      background:#fff;
+    }
+
+    .ppt-frame{
+      width:100%;
+      height:100%;
+
+      border:0;
+      display:block;
+
+      background:#fff;
+    }
+
+    .placeholder{
+      color:#888;
+      font-size:22px;
+      text-align:center;
+    }
+
+    .controls{
+      width:min(1250px,99vw);
+
+      min-height:58px;
+
+      padding:7px 10px;
+
+      display:flex;
+      align-items:center;
+
+      gap:10px;
+
+      border:1px solid var(--border);
+      border-radius:16px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(165,124,234,.863),
+          rgba(204,198,208,.767) 50%,
+          rgba(255,217,0,.884)
+        );
+
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+
+      box-shadow:
+        0 10px 35px rgba(0,0,0,.28),
+        inset 0 1px 0 rgba(255,255,255,.14);
+    }
+
+    .nav{
+      width:44px;
+      height:44px;
+
+      flex:0 0 44px;
+
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:12px;
+
+      background:rgba(255,255,255,.12);
+
+      color:white;
+
+      font-size:32px;
+      line-height:1;
+
+      cursor:pointer;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      transition:
+        transform .12s ease,
+        background .15s ease;
+    }
+
+    .nav:hover{
+      background:rgba(255,255,255,.20);
+    }
+
+    .nav:active{
+      transform:scale(.94);
+      background:rgba(8,5,95,.18);
+    }
+
+    .progress-box{
+      flex:1;
+
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+
+      gap:3px;
+    }
+
+    #progress{
+      width:100%;
+
+      accent-color:var(--yellow);
+
+      cursor:pointer;
+    }
+
+    .counter{
+      color:white;
+
+      font-size:13px;
+
+      direction:ltr;
+
+      text-shadow:
+        0 1px 3px rgba(0,0,0,.35);
+    }
+
+    @media(max-width:700px){
+
+      #app{
+        padding:8px;
+        gap:9px;
+      }
+
+      .book-wrap{
+        height:calc(100vh - 100px);
+      }
+
+      .controls{
+        min-height:52px;
+        padding:5px 7px;
+      }
+
+      .nav{
+        width:38px;
+        height:38px;
+
+        flex-basis:38px;
+
+        font-size:28px;
+      }
+
+      .page-inner{
+        padding:1px;
+      }
+    }
+
+    @media(max-width:700px) and (orientation:portrait){
+
+      .book-wrap{
+        width:100%;
+        height:calc(100vh - 100px);
+      }
+    }
+
+    @media(min-width:701px) and (orientation:landscape){
+
+      .book-wrap{
+        width:min(1250px,99vw);
+        height:min(78vh,760px);
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <div id="app">
+
+    <div class="book-wrap">
+
+      <div id="book" class="book">
+
+        <div id="page" class="page">
+
+          <div class="page-inner">
+
+            <div id="content" class="media-page"></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="controls">
+
+      <button
+        class="nav"
+        id="prev"
+        aria-label="صفحه قبل"
+      >
+        ‹
+      </button>
+
+
+      <div class="progress-box">
+
+        <input
+          id="progress"
+          type="range"
+          min="1"
+          max="30"
+          value="1"
+          step="1"
+          aria-label="شماره صفحه"
+        >
+
+        <div class="counter">
+
+          <span id="current">1</span>
+
+          /
+
+          <span id="total">30</span>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="nav"
+        id="next"
+        aria-label="صفحه بعد"
+      >
+        ›
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    /* =========================
+       تنظیمات اصلی
+    ========================= */
+
+    const TOTAL_PAGES = 30;
+
+    let currentPage = 1;
+
+
+    /*
+      مسیر PowerPoint کامپیوتر
+
+      ساختار پوشه:
+
+      digital-book/
+      ├── index.html
+      └── ppt/
+          └── PC/
+              └── pc.pptx
+    */
+
+    const PPT_PC_URL = "ppt/PC/pc.pptx";
+
+
+    /*
+      نسخه موبایل فعلاً استفاده نمی‌شود.
+      بعداً اگر خواستیم نسخه موبایل جدا داشته باشیم
+      این قسمت را اضافه می‌کنیم.
+    */
+
+    const PPT_PHONE_URL = "";
+
+
+    /* =========================
+       عناصر صفحه
+    ========================= */
+
+    const page =
+      document.getElementById("page");
+
+    const content =
+      document.getElementById("content");
+
+    const progress =
+      document.getElementById("progress");
+
+    const current =
+      document.getElementById("current");
+
+    const total =
+      document.getElementById("total");
+
+    const prev =
+      document.getElementById("prev");
+
+    const next =
+      document.getElementById("next");
+
+
+    total.textContent =
+      TOTAL_PAGES;
+
+    progress.max =
+      TOTAL_PAGES;
+
+
+    /* =========================
+       تمام صفحات فقط PPT
+    ========================= */
+
+    const pages = Array.from(
+      { length: TOTAL_PAGES },
+      () => ({
+        type: "ppt"
+      })
+    );
+
+
+    /* =========================
+       تشخیص موبایل
+    ========================= */
+
+    function isPhone(){
+
+      return window.matchMedia(
+        "(max-width:700px) and (orientation:portrait)"
+      ).matches;
+
+    }
+
+
+    /* =========================
+       انتخاب PPT
+    ========================= */
+
+    function getPptUrl(){
+
+      if(isPhone()){
+
+        /*
+          فعلاً موبایل همان PPT کامپیوتر را می‌گیرد
+          تا نسخه موبایل را بعداً اضافه کنیم.
+        */
+
+        return PPT_PC_URL;
+
+      }
+
+      return PPT_PC_URL;
+
+    }
+
+
+    /* =========================
+       ساخت PowerPoint
+    ========================= */
+
+    function createPowerPoint(){
+
+      const url =
+        getPptUrl();
+
+
+      if(!url){
+
+        const message =
+          document.createElement("div");
+
+        message.className =
+          "placeholder";
+
+        message.textContent =
+          "فایل PowerPoint تعیین نشده است.";
+
+        return message;
+
+      }
+
+
+      const frame =
+        document.createElement("iframe");
+
+
+      frame.className =
+        "ppt-frame";
+
+
+      /*
+        Office Online Viewer
+
+        توجه:
+        برای فایل محلی ممکن است نمایش ندهد.
+        فایل باید در حالت نهایی روی یک آدرس
+        اینترنتی قابل دسترسی باشد.
+      */
+
+      frame.src =
+        "https://view.officeapps.live.com/op/embed.aspx?src=" +
+        encodeURIComponent(url);
+
+
+      frame.allowFullscreen =
+        true;
+
+
+      frame.loading =
+        "lazy";
+
+
+      return frame;
+
+    }
+
+
+    /* =========================
+       نمایش صفحه
+    ========================= */
+
+    function renderPage(){
+
+      const pageData =
+        pages[currentPage - 1];
+
+
+      content.innerHTML =
+        "";
+
+
+      if(!pageData){
+
+        return;
+
+      }
+
+
+      const media =
+        document.createElement("div");
+
+      media.className =
+        "media-page";
+
+
+      if(pageData.type === "ppt"){
+
+        media.appendChild(
+          createPowerPoint()
+        );
+
+      }
+
+
+      content.appendChild(
+        media
+      );
+
+    }
+
+
+    /* =========================
+       نمایش صفحه با انیمیشن
+    ========================= */
+
+    function showPage(
+      number,
+      direction = 1
+    ){
+
+      if(number < 1){
+
+        number = 1;
+
+      }
+
+
+      if(number > TOTAL_PAGES){
+
+        number = TOTAL_PAGES;
+
+      }
+
+
+      if(number === currentPage){
+
+        renderPage();
+
+        return;
+
+      }
+
+
+      currentPage =
+        number;
+
+
+      page.style.transition =
+        "transform .22s ease, opacity .22s ease";
+
+
+      page.style.transform =
+        `translateX(${direction * 35}px)`;
+
+
+      page.style.opacity =
+        "0";
+
+
+      setTimeout(() => {
+
+        renderPage();
+
+
+        progress.value =
+          currentPage;
+
+
+        current.textContent =
+          currentPage;
+
+
+        page.style.transform =
+          `translateX(${-direction * 35}px)`;
+
+
+        requestAnimationFrame(() => {
+
+          page.style.transform =
+            "translateX(0)";
+
+          page.style.opacity =
+            "1";
+
+        });
+
+      }, 120);
+
+    }
+
+
+    /* =========================
+       دکمه قبلی
+    ========================= */
+
+    prev.addEventListener(
+      "click",
+      () => {
+
+        showPage(
+          currentPage - 1,
+          -1
+        );
+
+      }
+    );
+
+
+    /* =========================
+       دکمه بعدی
+    ========================= */
+
+    next.addEventListener(
+      "click",
+      () => {
+
+        showPage(
+          currentPage + 1,
+          1
+        );
+
+      }
+    );
+
+
+    /* =========================
+       نوار صفحات
+    ========================= */
+
+    progress.addEventListener(
+      "input",
+      () => {
+
+        const number =
+          Number(progress.value);
+
+
+        const direction =
+          number > currentPage
+            ? 1
+            : -1;
+
+
+        showPage(
+          number,
+          direction
+        );
+
+      }
+    );
+
+
+    /* =========================
+       کیبورد
+    ========================= */
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+
+        if(event.key === "ArrowRight"){
+
+          showPage(
+            currentPage + 1,
+            1
+          );
+
+        }
+
+
+        if(event.key === "ArrowLeft"){
+
+          showPage(
+            currentPage - 1,
+            -1
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       Swipe موبایل
+    ========================= */
+
+    let touchStartX =
+      0;
+
+    let touchEndX =
+      0;
+
+
+    page.addEventListener(
+      "touchstart",
+      (event) => {
+
+        touchStartX =
+          event.changedTouches[0].screenX;
+
+      },
+      { passive:true }
+    );
+
+
+    page.addEventListener(
+      "touchend",
+      (event) => {
+
+        touchEndX =
+          event.changedTouches[0].screenX;
+
+
+        const difference =
+          touchEndX - touchStartX;
+
+
+        if(Math.abs(difference) < 50){
+
+          return;
+
+        }
+
+
+        if(difference < 0){
+
+          showPage(
+            currentPage + 1,
+            1
+          );
+
+        }
+        else{
+
+          showPage(
+            currentPage - 1,
+            -1
+          );
+
+        }
+
+      },
+      { passive:true }
+    );
+
+
+    /* =========================
+       تغییر اندازه صفحه
+    ========================= */
+
+    window.addEventListener(
+      "resize",
+      () => {
+
+        renderPage();
+
+      }
+    );
+
+
+    /* =========================
+       شروع
+    ========================= */
+
+    renderPage();
+
+    progress.value =
+      currentPage;
+
+    current.textContent =
+      currentPage;
+
+  </script>
+
+</body>
+
+</html>
+```
