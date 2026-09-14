@@ -1,74 +1,1219 @@
+```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Digital Book</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<title>Digital Book</title>
 
-    <style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-        /* =========================================================
-           COLOR SYSTEM
-        ========================================================= */
+<style>
 
-        :root {
-            --purple: #d9c2ff;
-            --purple-light: #eee4ff;
+/* =========================
+   BASE
+========================= */
 
-            --yellow: #f5df91;
-            --yellow-light: #fff1b8;
+* {
+    box-sizing: border-box;
+}
 
-            --white: #ffffff;
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
 
-            --glass: rgba(255, 255, 255, 0.48);
-            --glass-border: rgba(255, 255, 255, 0.78);
+body {
 
-            --text-main: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.90);
+    min-height: 100vh;
+
+    font-family:
+        Arial,
+        Tahoma,
+        sans-serif;
+
+    background:
+
+        radial-gradient(
+            ellipse 68% 68% at 0% 0%,
+            rgba(218, 194, 255, 0.98) 0%,
+            rgba(226, 205, 255, 0.84) 24%,
+            rgba(239, 228, 255, 0.48) 48%,
+            rgba(255, 255, 255, 0) 74%
+        ),
+
+        radial-gradient(
+            ellipse 72% 72% at 100% 100%,
+            rgba(245, 223, 145, 0.98) 0%,
+            rgba(248, 228, 158, 0.82) 25%,
+            rgba(255, 241, 188, 0.48) 48%,
+            rgba(255, 255, 255, 0) 74%
+        ),
+
+        radial-gradient(
+            ellipse 72% 72% at 50% 50%,
+            rgba(255, 255, 255, 0.94) 0%,
+            rgba(255, 255, 255, 0.88) 32%,
+            rgba(255, 255, 255, 0.48) 58%,
+            rgba(255, 255, 255, 0.08) 100%
+        );
+
+    overflow: hidden;
+
+    transition:
+        background 0.25s ease;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.app {
+
+    width: 100%;
+    height: 100vh;
+
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+}
+
+
+/* =========================
+   BOOK
+========================= */
+
+.book-wrap {
+
+    width: min(1250px, 99vw);
+
+    flex: 1;
+
+    min-height: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+
+.book {
+
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background:
+        rgba(255, 255, 255, 0.88);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.9);
+
+    box-shadow:
+
+        0 14px 40px rgba(100, 75, 145, 0.16),
+
+        0 3px 10px rgba(100, 75, 145, 0.10);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+
+.page-inner {
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+
+#pdfCanvas {
+
+    display: block;
+
+    max-width: 100%;
+    max-height: 100%;
+
+    touch-action: pan-y;
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+#loading {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 16px;
+
+    color: #735a92;
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    z-index: 10;
+}
+
+#loading.hidden {
+    display: none;
+}
+
+
+/* =========================
+   CONTROL PANEL
+========================= */
+
+.controls {
+
+    width: min(1250px, 99vw);
+
+    margin-top: 14px;
+
+    padding: 11px 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    border-radius: 17px;
+
+    background:
+        rgba(255, 255, 255, 0.48);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.78);
+
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+
+    box-shadow:
+
+        0 8px 24px rgba(130, 105, 175, 0.16),
+
+        0 2px 7px rgba(130, 105, 175, 0.10),
+
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+
+.control-button {
+
+    width: 43px;
+    height: 39px;
+
+    flex-shrink: 0;
+
+    border-radius: 11px;
+
+    cursor: pointer;
+
+    font-size: 18px;
+    font-weight: 500;
+
+    background:
+
+        linear-gradient(
+            145deg,
+            rgba(226, 210, 255, 0.88),
+            rgba(205, 183, 244, 0.82)
+        );
+
+    border:
+        1px solid rgba(178, 151, 222, 0.55);
+
+    color: #76599f;
+
+    box-shadow:
+
+        0 4px 10px rgba(125, 95, 170, 0.18),
+
+        inset 0 1px 1px rgba(255, 255, 255, 0.75);
+
+    transition:
+
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.control-button:hover {
+
+    background:
+
+        linear-gradient(
+            145deg,
+            rgba(234, 221, 255, 0.96),
+            rgba(213, 192, 249, 0.94)
+        );
+
+    border-color:
+        rgba(164, 133, 213, 0.72);
+
+    box-shadow:
+
+        0 6px 16px rgba(125, 95, 170, 0.24),
+
+        inset 0 1px 2px rgba(255, 255, 255, 0.90);
+
+    transform:
+        translateY(-1px);
+}
+
+
+.control-button:active {
+
+    transform:
+        translateY(1px);
+
+    box-shadow:
+
+        0 2px 6px rgba(125, 95, 170, 0.18),
+
+        inset 0 2px 4px rgba(125, 95, 170, 0.10);
+}
+
+
+.control-button:disabled {
+
+    opacity: 0.42;
+
+    cursor: default;
+
+    box-shadow:
+
+        0 2px 6px rgba(125, 95, 170, 0.08);
+
+    transform: none;
+}
+
+
+#progress {
+
+    flex: 1;
+
+    min-width: 50px;
+
+    height: 6px;
+
+    accent-color: #a98bd3;
+
+    cursor: pointer;
+}
+
+
+.page-counter {
+
+    min-width: 65px;
+
+    text-align: center;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    color: #735a92;
+
+    direction: ltr;
+
+    white-space: nowrap;
+}
+
+
+#themeButton {
+
+    color: #73549c;
+
+    border-color:
+        rgba(170, 143, 214, 0.58);
+
+    background:
+
+        linear-gradient(
+            145deg,
+            rgba(228, 213, 255, 0.90),
+            rgba(207, 185, 245, 0.84)
+        );
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+
+    .app {
+        padding: 6px;
+    }
+
+    .book-wrap {
+        width: 100%;
+        height: min(76vh, 720px);
+    }
+
+    .book {
+        border-radius: 14px;
+    }
+
+    .controls {
+
+        width: 100%;
+
+        margin-top: 10px;
+
+        padding: 8px 9px;
+
+        gap: 7px;
+
+        border-radius: 14px;
+    }
+
+    .control-button {
+
+        width: 40px;
+        height: 36px;
+
+        font-size: 16px;
+    }
+
+    .page-counter {
+
+        min-width: 58px;
+
+        font-size: 13px;
+    }
+
+    #progress {
+        min-width: 40px;
+    }
+}
+
+
+@media (max-width: 420px) {
+
+    .controls {
+
+        gap: 5px;
+
+        padding: 7px;
+    }
+
+    .control-button {
+
+        width: 36px;
+        height: 34px;
+
+        font-size: 15px;
+    }
+
+    .page-counter {
+
+        min-width: 52px;
+
+        font-size: 12px;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <div class="book-wrap">
+
+        <div class="book">
+
+            <div class="page-inner">
+
+                <canvas id="pdfCanvas"></canvas>
+
+            </div>
+
+            <div id="loading">
+                در حال بارگذاری کتاب...
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="controls">
+
+        <button
+            id="prevButton"
+            class="control-button"
+            type="button"
+            aria-label="صفحه قبل"
+        >
+            ‹
+        </button>
+
+
+        <input
+            id="progress"
+            type="range"
+            min="1"
+            max="1"
+            value="1"
+            step="1"
+            aria-label="انتخاب صفحه"
+        >
+
+
+        <div
+            id="pageCounter"
+            class="page-counter"
+        >
+            1 / 1
+        </div>
+
+
+        <button
+            id="nextButton"
+            class="control-button"
+            type="button"
+            aria-label="صفحه بعد"
+        >
+            ›
+        </button>
+
+
+        <button
+            id="themeButton"
+            class="control-button"
+            type="button"
+            aria-label="تغییر حالت"
+        >
+            ☀
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   PDF.JS
+========================================================= */
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+
+/* =========================================================
+   PDF PATHS
+========================================================= */
+
+const PHONE_PDF =
+    "https://mohammabali126-hash.github.io/digital-book/ppt/Phone/phone.pdf";
+
+const PC_PDF =
+    "https://mohammabali126-hash.github.io/digital-book/ppt/PC/pc.pdf";
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const canvas =
+    document.getElementById("pdfCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+const loading =
+    document.getElementById("loading");
+
+const progress =
+    document.getElementById("progress");
+
+const pageCounter =
+    document.getElementById("pageCounter");
+
+const prevButton =
+    document.getElementById("prevButton");
+
+const nextButton =
+    document.getElementById("nextButton");
+
+const themeButton =
+    document.getElementById("themeButton");
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let pdfDoc = null;
+
+let currentPage = 1;
+
+let totalPages = 0;
+
+let rendering = false;
+
+let pendingPage = null;
+
+let isLight = true;
+
+
+/*
+    وضعیت فعلی صفحه:
+
+    "PORTRAIT" = عمودی = Phone
+    "LANDSCAPE" = افقی = PC
+*/
+
+let currentOrientation = null;
+
+
+/* =========================================================
+   GET ORIENTATION
+========================================================= */
+
+function getOrientation() {
+
+    if (window.innerWidth >= window.innerHeight) {
+
+        return "LANDSCAPE";
+
+    }
+
+    return "PORTRAIT";
+}
+
+
+/* =========================================================
+   GET PDF URL
+========================================================= */
+
+function getPDFUrl(orientation) {
+
+    if (orientation === "PORTRAIT") {
+
+        return PHONE_PDF;
+
+    }
+
+    return PC_PDF;
+}
+
+
+/* =========================================================
+   LOAD PDF
+========================================================= */
+
+async function loadPDF(
+    orientation,
+    pageToOpen = 1
+) {
+
+    const pdfURL =
+        getPDFUrl(orientation);
+
+
+    try {
+
+        loading.classList.remove("hidden");
+
+        loading.textContent =
+            "در حال بارگذاری کتاب...";
+
+
+        /*
+            هنگام تعویض فایل، رندر قبلی را متوقف می‌کنیم.
+        */
+
+        rendering = false;
+
+        pendingPage = null;
+
+
+        const loadingTask =
+            pdfjsLib.getDocument(pdfURL);
+
+
+        const newPdfDoc =
+            await loadingTask.promise;
+
+
+        /*
+            فایل جدید با موفقیت لود شده.
+        */
+
+        pdfDoc =
+            newPdfDoc;
+
+
+        totalPages =
+            pdfDoc.numPages;
+
+
+        /*
+            اگر شماره صفحه در فایل جدید وجود نداشته باشد،
+            به آخرین صفحه موجود می‌رویم.
+        */
+
+        currentPage =
+            Math.min(
+                Math.max(1, pageToOpen),
+                totalPages
+            );
+
+
+        progress.min = 1;
+
+        progress.max = totalPages;
+
+        progress.value = currentPage;
+
+
+        updateControls();
+
+
+        /*
+            همان شماره صفحه قبلی را باز می‌کنیم.
+        */
+
+        await showPage(currentPage);
+
+
+        currentOrientation =
+            orientation;
+
+
+        loading.classList.add("hidden");
+
+
+    } catch (error) {
+
+        console.error(
+            "PDF loading error:",
+            error
+        );
+
+        loading.textContent =
+            "خطا در بارگذاری فایل PDF";
+    }
+}
+
+
+/* =========================================================
+   SHOW PAGE
+========================================================= */
+
+async function showPage(pageNumber) {
+
+    if (!pdfDoc) return;
+
+
+    if (rendering) {
+
+        pendingPage =
+            pageNumber;
+
+        return;
+    }
+
+
+    rendering = true;
+
+
+    try {
+
+        const page =
+            await pdfDoc.getPage(pageNumber);
+
+
+        const container =
+            document.querySelector(".page-inner");
+
+
+        const containerWidth =
+            container.clientWidth;
+
+
+        const containerHeight =
+            container.clientHeight;
+
+
+        const viewport =
+            page.getViewport({
+                scale: 1
+            });
+
+
+        const scaleX =
+            containerWidth /
+            viewport.width;
+
+
+        const scaleY =
+            containerHeight /
+            viewport.height;
+
+
+        let scale =
+            Math.min(
+                scaleX,
+                scaleY
+            );
+
+
+        scale *= 0.97;
+
+
+        const devicePixelRatio =
+            window.devicePixelRatio || 1;
+
+
+        const renderViewport =
+            page.getViewport({
+                scale: scale
+            });
+
+
+        canvas.width =
+            Math.floor(
+                renderViewport.width *
+                devicePixelRatio
+            );
+
+
+        canvas.height =
+            Math.floor(
+                renderViewport.height *
+                devicePixelRatio
+            );
+
+
+        canvas.style.width =
+            Math.floor(
+                renderViewport.width
+            ) + "px";
+
+
+        canvas.style.height =
+            Math.floor(
+                renderViewport.height
+            ) + "px";
+
+
+        ctx.setTransform(
+            devicePixelRatio,
+            0,
+            0,
+            devicePixelRatio,
+            0,
+            0
+        );
+
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+        await page.render({
+
+            canvasContext: ctx,
+
+            viewport:
+                renderViewport
+
+        }).promise;
+
+
+        currentPage =
+            pageNumber;
+
+
+        progress.value =
+            currentPage;
+
+
+        updateControls();
+
+
+    } catch (error) {
+
+        console.error(
+            "PDF render error:",
+            error
+        );
+
+
+    } finally {
+
+        rendering = false;
+
+
+        if (
+            pendingPage !== null
+        ) {
+
+            const nextPage =
+                pendingPage;
+
+
+            pendingPage =
+                null;
+
+
+            showPage(
+                nextPage
+            );
+        }
+    }
+}
+
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+
+function updateControls() {
+
+    pageCounter.textContent =
+        currentPage +
+        " / " +
+        totalPages;
+
+
+    prevButton.disabled =
+        currentPage <= 1;
+
+
+    nextButton.disabled =
+        currentPage >= totalPages;
+
+
+    progress.value =
+        currentPage;
+}
+
+
+/* =========================================================
+   PREVIOUS
+========================================================= */
+
+prevButton.addEventListener(
+    "click",
+    function () {
+
+        if (
+            currentPage > 1
+        ) {
+
+            showPage(
+                currentPage - 1
+            );
+        }
+    }
+);
+
+
+/* =========================================================
+   NEXT
+========================================================= */
+
+nextButton.addEventListener(
+    "click",
+    function () {
+
+        if (
+            currentPage < totalPages
+        ) {
+
+            showPage(
+                currentPage + 1
+            );
+        }
+    }
+);
+
+
+/* =========================================================
+   SLIDER
+========================================================= */
+
+progress.addEventListener(
+    "input",
+    function () {
+
+        const pageNumber =
+            Number(
+                progress.value
+            );
+
+
+        pageCounter.textContent =
+            pageNumber +
+            " / " +
+            totalPages;
+    }
+);
+
+
+progress.addEventListener(
+    "change",
+    function () {
+
+        const pageNumber =
+            Number(
+                progress.value
+            );
+
+
+        showPage(
+            pageNumber
+        );
+    }
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            event.key === "ArrowLeft" ||
+            event.key === "ArrowUp"
+        ) {
+
+            if (
+                currentPage > 1
+            ) {
+
+                showPage(
+                    currentPage - 1
+                );
+            }
         }
 
 
-        /* =========================================================
-           GLOBAL
-        ========================================================= */
+        if (
+            event.key === "ArrowRight" ||
+            event.key === "ArrowDown"
+        ) {
 
-        * {
-            box-sizing: border-box;
+            if (
+                currentPage < totalPages
+            ) {
+
+                showPage(
+                    currentPage + 1
+                );
+            }
+        }
+    }
+);
+
+
+/* =========================================================
+   TOUCH SWIPE
+========================================================= */
+
+let touchStartX = 0;
+
+let touchEndX = 0;
+
+
+canvas.addEventListener(
+    "touchstart",
+    function (event) {
+
+        if (
+            event.touches.length !== 1
+        ) return;
+
+
+        touchStartX =
+            event.touches[0].clientX;
+
+    },
+    {
+        passive: true
+    }
+);
+
+
+canvas.addEventListener(
+    "touchend",
+    function (event) {
+
+        if (
+            event.changedTouches.length !== 1
+        ) return;
+
+
+        touchEndX =
+            event.changedTouches[0].clientX;
+
+
+        handleSwipe();
+
+    },
+    {
+        passive: true
+    }
+);
+
+
+function handleSwipe() {
+
+    const difference =
+        touchEndX -
+        touchStartX;
+
+
+    const minimumSwipe =
+        50;
+
+
+    if (
+        Math.abs(difference) <
+        minimumSwipe
+    ) return;
+
+
+    if (
+        difference > 0
+    ) {
+
+        if (
+            currentPage < totalPages
+        ) {
+
+            showPage(
+                currentPage + 1
+            );
         }
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
+    } else {
+
+        if (
+            currentPage > 1
+        ) {
+
+            showPage(
+                currentPage - 1
+            );
         }
+    }
+}
 
 
-        /* =========================================================
-           BODY
-        ========================================================= */
+/* =========================================================
+   THEME
+========================================================= */
 
-        body {
+themeButton.addEventListener(
+    "click",
+    function () {
 
-            font-family: Arial, Tahoma, sans-serif;
+        isLight =
+            !isLight;
 
-            color: var(--text-main);
 
-            /*
-               حالت روز تثبیت‌شده:
+        if (isLight) {
 
-               بالا چپ      = یاسی روشن
-               مرکز         = سفید، ولی کنترل‌شده
-               پایین راست   = زرد گرم و روشن
-            */
+            document.body.style.background =
+                `
+                radial-gradient(
+                    ellipse 68% 68% at 0% 0%,
+                    rgba(218, 194, 255, 0.98) 0%,
+                    rgba(226, 205, 255, 0.84) 24%,
+                    rgba(239, 228, 255, 0.48) 48%,
+                    rgba(255, 255, 255, 0) 74%
+                ),
 
-            background:
+                radial-gradient(
+                    ellipse 72% 72% at 100% 100%,
+                    rgba(245, 223, 145, 0.98) 0%,
+                    rgba(248, 228, 158, 0.82) 25%,
+                    rgba(255, 241, 188, 0.48) 48%,
+                    rgba(255, 255, 255, 0) 74%
+                ),
+
+                radial-gradient(
+                    ellipse 72% 72% at 50% 50%,
+                    rgba(255, 255, 255, 0.94) 0%,
+                    rgba(255, 255, 255, 0.88) 32%,
+                    rgba(255, 255, 255, 0.48) 58%,
+                    rgba(255, 255, 255, 0.08) 100%
+                )
+                `;
+
+
+            themeButton.textContent =
+                "☀";
+
+
+        } else {
+
+            document.body.style.background =
+                `
+                linear-gradient(
+                    rgba(0, 0, 0, 0.60),
+                    rgba(0, 0, 0, 0.60)
+                ),
 
                 radial-gradient(
                     ellipse 68% 68% at 0% 0%,
@@ -92,1082 +1237,158 @@
                     rgba(255, 255, 255, 0.88) 32%,
                     rgba(255, 255, 255, 0.48) 58%,
                     rgba(255, 255, 255, 0.08) 100%
-                );
+                )
+                `;
 
-            transition:
-                background 0.35s ease,
-                color 0.35s ease;
+
+            themeButton.textContent =
+                "🌙";
+        }
+    }
+);
+
+
+/* =========================================================
+   AUTOMATIC ORIENTATION DETECTION
+========================================================= */
+
+let orientationTimer = null;
+
+
+function checkOrientation() {
+
+    const newOrientation =
+        getOrientation();
+
+
+    /*
+        اگر اولین بار است،
+        PDF مناسب را باز کن.
+    */
+
+    if (
+        currentOrientation === null
+    ) {
+
+        loadPDF(
+            newOrientation,
+            currentPage
+        );
+
+        return;
+    }
+
+
+    /*
+        اگر جهت صفحه واقعاً عوض نشده،
+        فقط اندازه PDF را دوباره تنظیم کن.
+    */
+
+    if (
+        newOrientation ===
+        currentOrientation
+    ) {
+
+        if (pdfDoc) {
+
+            showPage(
+                currentPage
+            );
         }
 
+        return;
+    }
 
-        /* =========================================================
-           MAIN APP
-        ========================================================= */
 
-        .app {
+    /*
+        اینجا جهت واقعاً عوض شده است.
 
-            width: 100%;
-            height: 100%;
+        مهم:
+        شماره صفحه فعلی را نگه می‌داریم.
+    */
 
-            display: flex;
+    const pageToKeep =
+        currentPage;
 
-            flex-direction: column;
 
-            align-items: center;
-            justify-content: center;
+    currentOrientation =
+        newOrientation;
 
-            padding: 10px;
-        }
 
+    /*
+        فایل جدید را باز می‌کنیم
+        و همان صفحه قبلی را نمایش می‌دهیم.
+    */
 
-        /* =========================================================
-           BOOK WRAPPER
-        ========================================================= */
+    loadPDF(
+        newOrientation,
+        pageToKeep
+    );
+}
 
-        .book-wrap {
 
-            width: min(1250px, 99vw);
+/* =========================================================
+   RESIZE / ROTATION
+========================================================= */
 
-            height: min(78vh, 760px);
+window.addEventListener(
+    "resize",
+    function () {
 
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-        }
-
-
-        /* =========================================================
-           BOOK
-        ========================================================= */
-
-        .book {
-
-            width: 100%;
-            height: 100%;
-
-            background: #ffffff;
-
-            border-radius: 18px;
-
-            overflow: hidden;
-
-            position: relative;
-
-            box-shadow:
-                0 0 35px rgba(160, 130, 210, 0.16),
-                0 20px 70px rgba(100, 80, 130, 0.16);
-        }
-
-
-        /* =========================================================
-           PAGE
-        ========================================================= */
-
-        .page-inner {
-
-            width: 100%;
-            height: 100%;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            background: #ffffff;
-
-            overflow: hidden;
-        }
-
-
-        #pdfCanvas {
-
-            display: block;
-
-            max-width: 100%;
-            max-height: 100%;
-
-            background: #ffffff;
-        }
-
-
-        /* =========================================================
-           LOADING
-        ========================================================= */
-
-        #loading {
-
-            position: absolute;
-
-            inset: 0;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            background: rgba(255, 255, 255, 0.92);
-
-            color: #8065a8;
-
-            font-size: 18px;
-
-            z-index: 10;
-        }
-
-
-        #loading.hidden {
-            display: none;
-        }
-
-
-        /* =========================================================
-           CONTROL PANEL
-        ========================================================= */
-
-        .controls {
-
-            width: min(1250px, 99vw);
-
-            margin-top: 14px;
-
-            padding: 11px 15px;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-            border-radius: 17px;
-
-            background: rgba(255, 255, 255, 0.48);
-
-            border: 1px solid rgba(255, 255, 255, 0.78);
-
-            backdrop-filter: blur(22px);
-
-            -webkit-backdrop-filter: blur(22px);
-
-            box-shadow:
-                0 8px 24px rgba(130, 105, 175, 0.16),
-                0 2px 7px rgba(130, 105, 175, 0.10),
-                inset 0 1px 0 rgba(255, 255, 255, 0.85);
-        }
-
-
-        /* =========================================================
-           BUTTONS
-        ========================================================= */
-
-        .control-button {
-
-            width: 43px;
-            height: 39px;
-
-            flex-shrink: 0;
-
-            border-radius: 11px;
-
-            cursor: pointer;
-
-            font-size: 18px;
-
-            font-weight: 500;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(226, 210, 255, 0.88),
-                    rgba(205, 183, 244, 0.82)
-                );
-
-            border: 1px solid rgba(178, 151, 222, 0.55);
-
-            color: #76599f;
-
-            box-shadow:
-                0 4px 10px rgba(125, 95, 170, 0.18),
-                inset 0 1px 1px rgba(255, 255, 255, 0.75);
-
-            transition:
-                background 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease,
-                transform 0.2s ease;
-        }
-
-
-        .control-button:hover {
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(234, 221, 255, 0.96),
-                    rgba(213, 192, 249, 0.94)
-                );
-
-            border-color:
-                rgba(164, 133, 213, 0.72);
-
-            box-shadow:
-                0 6px 16px rgba(125, 95, 170, 0.24),
-                inset 0 1px 2px rgba(255, 255, 255, 0.90);
-
-            transform: translateY(-1px);
-        }
-
-
-        .control-button:active {
-
-            transform: translateY(1px);
-
-            box-shadow:
-                0 2px 6px rgba(125, 95, 170, 0.18),
-                inset 0 2px 4px rgba(125, 95, 170, 0.10);
-        }
-
-
-        .control-button:disabled {
-
-            opacity: 0.42;
-
-            cursor: default;
-
-            box-shadow:
-                0 2px 6px rgba(125, 95, 170, 0.08);
-
-            transform: none;
-        }
-
-
-        /* =========================================================
-           PROGRESS
-        ========================================================= */
-
-        #progress {
-
-            flex: 1;
-
-            min-width: 50px;
-
-            height: 6px;
-
-            accent-color: #a98bd3;
-
-            cursor: pointer;
-        }
-
-
-        /* =========================================================
-           PAGE COUNTER
-        ========================================================= */
-
-        .page-counter {
-
-            min-width: 65px;
-
-            text-align: center;
-
-            font-size: 14px;
-
-            font-weight: 500;
-
-            color: #735a92;
-
-            direction: ltr;
-
-            white-space: nowrap;
-        }
-
-
-        /* =========================================================
-           THEME BUTTON
-        ========================================================= */
-
-        #themeButton {
-
-            color: #73549c;
-
-            border-color:
-                rgba(170, 143, 214, 0.58);
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(228, 213, 255, 0.90),
-                    rgba(207, 185, 245, 0.84)
-                );
-        }
-
-
-        /* =========================================================
-           MOBILE
-        ========================================================= */
-
-        @media (max-width: 700px) {
-
-            .app {
-                padding: 6px;
-            }
-
-            .book-wrap {
-
-                width: 100%;
-
-                height: min(76vh, 720px);
-            }
-
-            .book {
-                border-radius: 14px;
-            }
-
-            .controls {
-
-                width: 100%;
-
-                margin-top: 10px;
-
-                padding: 8px 9px;
-
-                gap: 7px;
-
-                border-radius: 14px;
-            }
-
-            .control-button {
-
-                width: 40px;
-                height: 36px;
-
-                font-size: 16px;
-            }
-
-            .page-counter {
-
-                min-width: 58px;
-
-                font-size: 13px;
-            }
-
-            #progress {
-                min-width: 40px;
-            }
-        }
-
-
-        /* =========================================================
-           VERY SMALL SCREENS
-        ========================================================= */
-
-        @media (max-width: 420px) {
-
-            .controls {
-
-                gap: 5px;
-
-                padding: 7px;
-            }
-
-            .control-button {
-
-                width: 36px;
-                height: 34px;
-
-                font-size: 15px;
-            }
-
-            .page-counter {
-
-                min-width: 52px;
-
-                font-size: 12px;
-            }
-        }
-
-    </style>
-</head>
-
-
-<body>
-
-    <div class="app">
-
-        <!-- =====================================================
-             BOOK
-        ====================================================== -->
-
-        <div class="book-wrap">
-
-            <div class="book">
-
-                <div class="page-inner">
-
-                    <canvas id="pdfCanvas"></canvas>
-
-                </div>
-
-                <div id="loading">
-                    در حال بارگذاری کتاب...
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================================
-             CONTROLS
-        ====================================================== -->
-
-        <div class="controls">
-
-            <button
-                id="prevButton"
-                class="control-button"
-                type="button"
-                aria-label="صفحه قبل">
-                ‹
-            </button>
-
-
-            <input
-                id="progress"
-                type="range"
-                min="1"
-                max="1"
-                value="1"
-                step="1"
-                aria-label="انتخاب صفحه">
-
-
-            <div
-                id="pageCounter"
-                class="page-counter">
-                1 / 1
-            </div>
-
-
-            <button
-                id="nextButton"
-                class="control-button"
-                type="button"
-                aria-label="صفحه بعد">
-                ›
-            </button>
-
-
-            <button
-                id="themeButton"
-                class="control-button"
-                type="button"
-                aria-label="تغییر حالت">
-                ☀
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <script>
-
-        /* =========================================================
-           SETTINGS
-        ========================================================= */
-
-        const BOOK_TYPE = "PC";
-
-
-        /* =========================================================
-           PDF URL
-        ========================================================= */
-
-        const PDF_URL =
-            BOOK_TYPE === "PHONE"
-                ? "https://mohammabali126-hash.github.io/digital-book/ppt/Phone/phone.pdf"
-                : "https://mohammabali126-hash.github.io/digital-book/ppt/PC/pc.pdf";
-
-
-        /* =========================================================
-           PDF.JS WORKER
-        ========================================================= */
-
-        pdfjsLib.GlobalWorkerOptions.workerSrc =
-            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-
-        /* =========================================================
-           ELEMENTS
-        ========================================================= */
-
-        const canvas =
-            document.getElementById("pdfCanvas");
-
-        const ctx =
-            canvas.getContext("2d");
-
-        const loading =
-            document.getElementById("loading");
-
-        const progress =
-            document.getElementById("progress");
-
-        const pageCounter =
-            document.getElementById("pageCounter");
-
-        const prevButton =
-            document.getElementById("prevButton");
-
-        const nextButton =
-            document.getElementById("nextButton");
-
-        const themeButton =
-            document.getElementById("themeButton");
-
-
-        /* =========================================================
-           VARIABLES
-        ========================================================= */
-
-        let pdfDoc = null;
-
-        let currentPage = 1;
-
-        let totalPages = 0;
-
-        let rendering = false;
-
-        let pendingPage = null;
-
-        let isLight = true;
-
-
-        /* =========================================================
-           LOAD PDF
-        ========================================================= */
-
-        async function loadPDF() {
-
-            try {
-
-                loading.classList.remove("hidden");
-
-                const loadingTask =
-                    pdfjsLib.getDocument(PDF_URL);
-
-                pdfDoc =
-                    await loadingTask.promise;
-
-                totalPages =
-                    pdfDoc.numPages;
-
-                progress.max =
-                    totalPages;
-
-                progress.value =
-                    currentPage;
-
-                updateControls();
-
-                await showPage(currentPage);
-
-                loading.classList.add("hidden");
-
-            } catch (error) {
-
-                console.error(error);
-
-                loading.textContent =
-                    "خطا در بارگذاری فایل PDF";
-            }
-        }
-
-
-        /* =========================================================
-           SHOW PAGE
-        ========================================================= */
-
-        async function showPage(pageNumber) {
-
-            if (!pdfDoc) {
-                return;
-            }
-
-            if (rendering) {
-
-                pendingPage =
-                    pageNumber;
-
-                return;
-            }
-
-            rendering = true;
-
-            try {
-
-                const page =
-                    await pdfDoc.getPage(pageNumber);
-
-                const container =
-                    document.querySelector(".page-inner");
-
-                const containerWidth =
-                    container.clientWidth;
-
-                const containerHeight =
-                    container.clientHeight;
-
-                const viewport =
-                    page.getViewport({
-                        scale: 1
-                    });
-
-                const scaleX =
-                    containerWidth / viewport.width;
-
-                const scaleY =
-                    containerHeight / viewport.height;
-
-                let scale =
-                    Math.min(scaleX, scaleY);
-
-                scale *= 0.97;
-
-                const devicePixelRatio =
-                    window.devicePixelRatio || 1;
-
-                const renderViewport =
-                    page.getViewport({
-                        scale: scale
-                    });
-
-                canvas.width =
-                    Math.floor(
-                        renderViewport.width *
-                        devicePixelRatio
-                    );
-
-                canvas.height =
-                    Math.floor(
-                        renderViewport.height *
-                        devicePixelRatio
-                    );
-
-                canvas.style.width =
-                    Math.floor(
-                        renderViewport.width
-                    ) + "px";
-
-                canvas.style.height =
-                    Math.floor(
-                        renderViewport.height
-                    ) + "px";
-
-                ctx.setTransform(
-                    devicePixelRatio,
-                    0,
-                    0,
-                    devicePixelRatio,
-                    0,
-                    0
-                );
-
-                ctx.clearRect(
-                    0,
-                    0,
-                    canvas.width,
-                    canvas.height
-                );
-
-                await page.render({
-                    canvasContext: ctx,
-                    viewport: renderViewport
-                }).promise;
-
-                currentPage =
-                    pageNumber;
-
-                progress.value =
-                    currentPage;
-
-                updateControls();
-
-            } catch (error) {
-
-                console.error(
-                    "PDF render error:",
-                    error
-                );
-
-            } finally {
-
-                rendering = false;
-
-                if (pendingPage !== null) {
-
-                    const nextPage =
-                        pendingPage;
-
-                    pendingPage = null;
-
-                    showPage(nextPage);
-                }
-            }
-        }
-
-
-        /* =========================================================
-           UPDATE CONTROLS
-        ========================================================= */
-
-        function updateControls() {
-
-            pageCounter.textContent =
-                currentPage + " / " + totalPages;
-
-            prevButton.disabled =
-                currentPage <= 1;
-
-            nextButton.disabled =
-                currentPage >= totalPages;
-
-            progress.value =
-                currentPage;
-        }
-
-
-        /* =========================================================
-           PREVIOUS
-        ========================================================= */
-
-        prevButton.addEventListener(
-            "click",
-            function () {
-
-                if (currentPage > 1) {
-
-                    showPage(
-                        currentPage - 1
-                    );
-                }
-            }
+        clearTimeout(
+            orientationTimer
         );
 
 
-        /* =========================================================
-           NEXT
-        ========================================================= */
+        orientationTimer =
+            setTimeout(
+                function () {
 
-        nextButton.addEventListener(
-            "click",
-            function () {
+                    checkOrientation();
 
-                if (currentPage < totalPages) {
+                },
+                250
+            );
+    }
+);
 
-                    showPage(
-                        currentPage + 1
-                    );
-                }
-            }
+
+/*
+    بعضی موبایل‌ها رویداد orientationchange
+    را بهتر از resize گزارش می‌کنند.
+*/
+
+window.addEventListener(
+    "orientationchange",
+    function () {
+
+        clearTimeout(
+            orientationTimer
         );
 
 
-        /* =========================================================
-           SLIDER
-        ========================================================= */
+        orientationTimer =
+            setTimeout(
+                function () {
 
-        progress.addEventListener(
-            "input",
-            function () {
+                    checkOrientation();
 
-                const pageNumber =
-                    Number(progress.value);
+                },
+                350
+            );
+    }
+);
 
-                pageCounter.textContent =
-                    pageNumber + " / " + totalPages;
-            }
-        );
 
+/* =========================================================
+   START
+========================================================= */
 
-        progress.addEventListener(
-            "change",
-            function () {
+checkOrientation();
 
-                const pageNumber =
-                    Number(progress.value);
-
-                showPage(pageNumber);
-            }
-        );
-
-
-        /* =========================================================
-           KEYBOARD
-        ========================================================= */
-
-        document.addEventListener(
-            "keydown",
-            function (event) {
-
-                if (
-                    event.key === "ArrowLeft" ||
-                    event.key === "ArrowUp"
-                ) {
-
-                    if (currentPage > 1) {
-
-                        showPage(
-                            currentPage - 1
-                        );
-                    }
-                }
-
-                if (
-                    event.key === "ArrowRight" ||
-                    event.key === "ArrowDown"
-                ) {
-
-                    if (currentPage < totalPages) {
-
-                        showPage(
-                            currentPage + 1
-                        );
-                    }
-                }
-            }
-        );
-
-
-        /* =========================================================
-           TOUCH / SWIPE
-        ========================================================= */
-
-        let touchStartX = 0;
-
-        let touchEndX = 0;
-
-
-        canvas.addEventListener(
-            "touchstart",
-            function (event) {
-
-                if (event.touches.length !== 1) {
-                    return;
-                }
-
-                touchStartX =
-                    event.touches[0].clientX;
-
-            },
-            {
-                passive: true
-            }
-        );
-
-
-        canvas.addEventListener(
-            "touchend",
-            function (event) {
-
-                if (event.changedTouches.length !== 1) {
-                    return;
-                }
-
-                touchEndX =
-                    event.changedTouches[0].clientX;
-
-                handleSwipe();
-
-            },
-            {
-                passive: true
-            }
-        );
-
-
-        function handleSwipe() {
-
-            const difference =
-                touchEndX - touchStartX;
-
-            const minimumSwipe =
-                50;
-
-            if (
-                Math.abs(difference) <
-                minimumSwipe
-            ) {
-                return;
-            }
-
-            if (difference > 0) {
-
-                if (currentPage < totalPages) {
-
-                    showPage(
-                        currentPage + 1
-                    );
-                }
-
-            } else {
-
-                if (currentPage > 1) {
-
-                    showPage(
-                        currentPage - 1
-                    );
-                }
-            }
-        }
-
-
-        /* =========================================================
-           THEME BUTTON
-        ========================================================= */
-
-        themeButton.addEventListener(
-            "click",
-            function () {
-
-                isLight =
-                    !isLight;
-
-                if (isLight) {
-
-                    /*
-                       =================================================
-                       DAY MODE
-                       نسخه تثبیت‌شده
-                       =================================================
-                    */
-
-                    document.body.style.background =
-                        `
-                        radial-gradient(
-                            ellipse 68% 68% at 0% 0%,
-                            rgba(218, 194, 255, 0.98) 0%,
-                            rgba(226, 205, 255, 0.84) 24%,
-                            rgba(239, 228, 255, 0.48) 48%,
-                            rgba(255, 255, 255, 0) 74%
-                        ),
-
-                        radial-gradient(
-                            ellipse 72% 72% at 100% 100%,
-                            rgba(245, 223, 145, 0.98) 0%,
-                            rgba(248, 228, 158, 0.82) 25%,
-                            rgba(255, 241, 188, 0.48) 48%,
-                            rgba(255, 255, 255, 0) 74%
-                        ),
-
-                        radial-gradient(
-                            ellipse 72% 72% at 50% 50%,
-                            rgba(255, 255, 255, 0.94) 0%,
-                            rgba(255, 255, 255, 0.88) 32%,
-                            rgba(255, 255, 255, 0.48) 58%,
-                            rgba(255, 255, 255, 0.08) 100%
-                        )
-                        `;
-
-                    themeButton.textContent = "☀";
-
-                } else {
-
-                    /*
-                       =================================================
-                       NIGHT MODE
-                       =================================================
-
-                       همان رنگ‌های حالت روز حفظ می‌شوند،
-                       اما یک لایه مشکی با شفافیت 60٪
-                       روی کل پس‌زمینه قرار می‌گیرد.
-
-                       یعنی:
-
-                       رنگ روز
-                         ↓
-                       فیلتر مشکی 60٪
-                         ↓
-                       حالت شب واقعی
-                    */
-
-                    document.body.style.background =
-                        `
-                        linear-gradient(
-                            rgba(0, 0, 0, 0.60),
-                            rgba(0, 0, 0, 0.60)
-                        ),
-
-                        radial-gradient(
-                            ellipse 68% 68% at 0% 0%,
-                            rgba(218, 194, 255, 0.98) 0%,
-                            rgba(226, 205, 255, 0.84) 24%,
-                            rgba(239, 228, 255, 0.48) 48%,
-                            rgba(255, 255, 255, 0) 74%
-                        ),
-
-                        radial-gradient(
-                            ellipse 72% 72% at 100% 100%,
-                            rgba(245, 223, 145, 0.98) 0%,
-                            rgba(248, 228, 158, 0.82) 25%,
-                            rgba(255, 241, 188, 0.48) 48%,
-                            rgba(255, 255, 255, 0) 74%
-                        ),
-
-                        radial-gradient(
-                            ellipse 72% 72% at 50% 50%,
-                            rgba(255, 255, 255, 0.94) 0%,
-                            rgba(255, 255, 255, 0.88) 32%,
-                            rgba(255, 255, 255, 0.48) 58%,
-                            rgba(255, 255, 255, 0.08) 100%
-                        )
-                        `;
-
-                    themeButton.textContent = "🌙";
-                }
-            }
-        );
-
-
-        /* =========================================================
-           RESIZE
-        ========================================================= */
-
-        let resizeTimer = null;
-
-
-        window.addEventListener(
-            "resize",
-            function () {
-
-                clearTimeout(resizeTimer);
-
-                resizeTimer =
-                    setTimeout(
-                        function () {
-
-                            if (pdfDoc) {
-
-                                showPage(
-                                    currentPage
-                                );
-                            }
-
-                        },
-                        150
-                    );
-            }
-        );
-
-
-        /* =========================================================
-           START
-        ========================================================= */
-
-        loadPDF();
-
-    </script>
+</script>
 
 </body>
 
 </html>
+```
