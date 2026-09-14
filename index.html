@@ -12,10 +12,6 @@
 
 <style>
 
-/* =========================================================
-   BASE
-   ========================================================= */
-
 :root {
     --viewport-height: 100dvh;
     --controls-height: 64px;
@@ -82,10 +78,6 @@ body {
         max(8px, env(safe-area-inset-left));
 }
 
-/* =========================================================
-   BOOK
-   ========================================================= */
-
 .book-wrap {
     width: min(1250px, 99vw);
 
@@ -131,11 +123,9 @@ body {
 
     touch-action: none;
     user-select: none;
-}
 
-/* =========================================================
-   PDF CANVAS
-   ========================================================= */
+    cursor: default;
+}
 
 #pdfCanvas {
     display: block;
@@ -151,11 +141,9 @@ body {
 
     user-select: none;
     -webkit-user-drag: none;
-}
 
-/* =========================================================
-   LOADING
-   ========================================================= */
+    cursor: default;
+}
 
 #loading {
     position: absolute;
@@ -175,10 +163,6 @@ body {
 
     pointer-events: none;
 }
-
-/* =========================================================
-   CONTROL PANEL
-   ========================================================= */
 
 .controls {
     width: min(1250px, 99vw);
@@ -277,10 +261,6 @@ body {
         inset 0 2px 4px rgba(125, 95, 170, 0.10);
 }
 
-/* =========================================================
-   ZOOM BUTTON
-   ========================================================= */
-
 #zoomButton {
     color: #73549c;
 
@@ -295,10 +275,6 @@ body {
         );
 }
 
-/* =========================================================
-   PROGRESS
-   ========================================================= */
-
 #progress {
     flex: 1;
 
@@ -312,10 +288,6 @@ body {
 
     direction: rtl;
 }
-
-/* =========================================================
-   PAGE COUNTER
-   ========================================================= */
 
 .page-counter {
     min-width: 65px;
@@ -332,10 +304,6 @@ body {
     white-space: nowrap;
 }
 
-/* =========================================================
-   THEME
-   ========================================================= */
-
 #themeButton {
     color: #73549c;
 
@@ -349,10 +317,6 @@ body {
             rgba(207, 185, 245, 0.84)
         );
 }
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
 
 @media (max-width: 700px) {
 
@@ -447,10 +411,8 @@ body {
 
     </div>
 
-
     <div class="controls">
 
-        <!-- Zoom -->
         <button
             class="control-button"
             id="zoomButton"
@@ -460,8 +422,6 @@ body {
             🔍
         </button>
 
-
-        <!-- Page forward -->
         <button
             class="control-button"
             id="prev"
@@ -470,8 +430,6 @@ body {
             ‹
         </button>
 
-
-        <!-- Progress -->
         <input
             type="range"
             id="progress"
@@ -480,8 +438,6 @@ body {
             value="1"
         >
 
-
-        <!-- Page backward -->
         <button
             class="control-button"
             id="next"
@@ -490,16 +446,12 @@ body {
             ›
         </button>
 
-
-        <!-- Page counter -->
         <div class="page-counter">
             <span id="current">1</span>
             /
             <span id="total">-</span>
         </div>
 
-
-        <!-- Day / Night -->
         <button
             class="control-button"
             id="themeButton"
@@ -512,20 +464,11 @@ body {
 
 </div>
 
-
 <script>
-
-/* =========================================================
-   PDF.JS
-   ========================================================= */
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-
-/* =========================================================
-   PDF PATHS
-   ========================================================= */
 
 const PHONE_PDF =
     "https://mohammabali126-hash.github.io/digital-book/ppt/Phone/phone.pdf";
@@ -534,70 +477,51 @@ const PC_PDF =
     "https://mohammabali126-hash.github.io/digital-book/ppt/PC/pc.pdf";
 
 
-/* =========================================================
-   VARIABLES
-   ========================================================= */
-
 let pdfDocument = null;
-
 let currentPage = 1;
-
 let totalPages = 0;
-
 let currentOrientation = null;
-
 let rendering = false;
-
 let renderAgain = false;
 
-
-/* =========================================================
-   ZOOM VARIABLES
-   ========================================================= */
 
 let zoomLevel = 1;
 
 const MIN_ZOOM = 1;
-
 const MAX_ZOOM = 4;
-
 const ZOOM_STEP = 0.25;
 
 let panX = 0;
-
 let panY = 0;
 
 let zoomOriginX = 50;
-
 let zoomOriginY = 50;
 
 
 /* =========================================================
-   TOUCH VARIABLES
+   MOUSE PAN
    ========================================================= */
 
-let touchStartX = 0;
+let mousePanning = false;
 
-let touchStartY = 0;
-
-let touchStartTime = 0;
-
-let touchMoved = false;
-
-let pinchStartDistance = 0;
-
-let pinchStartZoom = 1;
-
-let pinchCenterX = 0;
-
-let pinchCenterY = 0;
-
-let isPinching = false;
+let mouseLastX = 0;
+let mouseLastY = 0;
 
 
 /* =========================================================
-   DOM
+   TOUCH
    ========================================================= */
+
+let touchStartX = 0;
+let touchStartY = 0;
+let touchStartTime = 0;
+let touchMoved = false;
+
+let pinchStartDistance = 0;
+let pinchStartZoom = 1;
+
+let isPinching = false;
+
 
 const canvas =
     document.getElementById("pdfCanvas");
@@ -632,10 +556,6 @@ const themeButton =
 const zoomButton =
     document.getElementById("zoomButton");
 
-
-/* =========================================================
-   VIEWPORT
-   ========================================================= */
 
 function updateViewportSize() {
 
@@ -682,10 +602,6 @@ function updateViewportSize() {
 }
 
 
-/* =========================================================
-   ORIENTATION
-   ========================================================= */
-
 function getOrientation() {
 
     return window.innerWidth <
@@ -695,21 +611,23 @@ function getOrientation() {
 }
 
 
-/* =========================================================
-   ZOOM RESET
-   ========================================================= */
-
 function resetZoom() {
 
     zoomLevel = 1;
 
     panX = 0;
-
     panY = 0;
 
     zoomOriginX = 50;
-
     zoomOriginY = 50;
+
+    mousePanning = false;
+
+    content.style.cursor =
+        "default";
+
+    canvas.style.cursor =
+        "default";
 
     applyZoom();
 
@@ -718,10 +636,6 @@ function resetZoom() {
     zoomButton.title = "زوم";
 }
 
-
-/* =========================================================
-   APPLY ZOOM
-   ========================================================= */
 
 function applyZoom() {
 
@@ -732,10 +646,6 @@ function applyZoom() {
         `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
 }
 
-
-/* =========================================================
-   LIMIT PAN
-   ========================================================= */
 
 function clampPan() {
 
@@ -750,15 +660,19 @@ function clampPan() {
     const extraX =
         Math.max(
             0,
-            (canvas.clientWidth * zoomLevel -
-                content.clientWidth) / 2
+            (
+                canvas.clientWidth * zoomLevel -
+                content.clientWidth
+            ) / 2
         );
 
     const extraY =
         Math.max(
             0,
-            (canvas.clientHeight * zoomLevel -
-                content.clientHeight) / 2
+            (
+                canvas.clientHeight * zoomLevel -
+                content.clientHeight
+            ) / 2
         );
 
     panX =
@@ -775,15 +689,14 @@ function clampPan() {
 }
 
 
-/* =========================================================
-   ZOOM AT POINT
-   ========================================================= */
-
 function zoomAtPoint(
     newZoom,
     clientX,
     clientY
 ) {
+
+    const oldZoom =
+        zoomLevel;
 
     newZoom =
         Math.max(
@@ -800,41 +713,48 @@ function zoomAtPoint(
     const y =
         clientY - rect.top;
 
-    zoomOriginX =
-        (x / rect.width) * 100;
 
-    zoomOriginY =
-        (y / rect.height) * 100;
+    /*
+     * مختصات نقطه موردنظر نسبت به مرکز
+     */
+
+    const centerX =
+        rect.width / 2;
+
+    const centerY =
+        rect.height / 2;
+
+    const offsetX =
+        x - centerX;
+
+    const offsetY =
+        y - centerY;
+
+
+    /*
+     * برای اینکه نقطه زیر موس
+     * هنگام زوم همانجا باقی بماند،
+     * مقدار Pan اصلاح می‌شود.
+     */
+
+    panX +=
+        offsetX *
+        (1 - newZoom / oldZoom);
+
+    panY +=
+        offsetY *
+        (1 - newZoom / oldZoom);
+
+
+    zoomOriginX = 50;
+    zoomOriginY = 50;
 
     zoomLevel = newZoom;
-
-    if (zoomLevel <= 1) {
-
-        panX = 0;
-        panY = 0;
-
-    } else {
-
-        /*
-         * نگه داشتن نقطه زیر موس/انگشت
-         * هنگام تغییر بزرگنمایی
-         */
-
-        const factor =
-            zoomLevel / Math.max(
-                MIN_ZOOM,
-                zoomLevel - ZOOM_STEP
-            );
-
-        if (!Number.isFinite(factor)) {
-            panX = 0;
-            panY = 0;
-        }
-    }
 
     clampPan();
 
     applyZoom();
+
 
     zoomButton.textContent =
         zoomLevel > 1
@@ -845,6 +765,23 @@ function zoomAtPoint(
         zoomLevel > 1
             ? "بازگشت به اندازه اصلی"
             : "زوم";
+
+    if (zoomLevel > 1) {
+
+        content.style.cursor =
+            "grab";
+
+        canvas.style.cursor =
+            "grab";
+
+    } else {
+
+        content.style.cursor =
+            "default";
+
+        canvas.style.cursor =
+            "default";
+    }
 }
 
 
@@ -883,11 +820,6 @@ content.addEventListener(
     "wheel",
     function(event) {
 
-        /*
-         * فقط وقتی Ctrl فشرده نشده،
-         * چرخ موس را برای زوم استفاده می‌کنیم.
-         */
-
         event.preventDefault();
 
         const direction =
@@ -908,6 +840,113 @@ content.addEventListener(
     },
     {
         passive: false
+    }
+);
+
+
+/* =========================================================
+   MOUSE LEFT BUTTON PAN
+   ========================================================= */
+
+content.addEventListener(
+    "mousedown",
+    function(event) {
+
+        /*
+         * فقط کلیک چپ
+         */
+
+        if (event.button !== 0) {
+            return;
+        }
+
+        /*
+         * بدون زوم، Pan نداریم.
+         */
+
+        if (zoomLevel <= 1) {
+            return;
+        }
+
+        mousePanning = true;
+
+        mouseLastX =
+            event.clientX;
+
+        mouseLastY =
+            event.clientY;
+
+        content.style.cursor =
+            "grabbing";
+
+        canvas.style.cursor =
+            "grabbing";
+
+        event.preventDefault();
+    }
+);
+
+
+window.addEventListener(
+    "mousemove",
+    function(event) {
+
+        if (!mousePanning) {
+            return;
+        }
+
+        const dx =
+            event.clientX -
+            mouseLastX;
+
+        const dy =
+            event.clientY -
+            mouseLastY;
+
+        panX += dx;
+        panY += dy;
+
+        mouseLastX =
+            event.clientX;
+
+        mouseLastY =
+            event.clientY;
+
+        clampPan();
+
+        applyZoom();
+
+        event.preventDefault();
+    }
+);
+
+
+window.addEventListener(
+    "mouseup",
+    function() {
+
+        if (!mousePanning) {
+            return;
+        }
+
+        mousePanning = false;
+
+        if (zoomLevel > 1) {
+
+            content.style.cursor =
+                "grab";
+
+            canvas.style.cursor =
+                "grab";
+
+        } else {
+
+            content.style.cursor =
+                "default";
+
+            canvas.style.cursor =
+                "default";
+        }
     }
 );
 
@@ -960,15 +999,6 @@ content.addEventListener(
             pinchStartZoom =
                 zoomLevel;
 
-            const center =
-                getTouchCenter(
-                    event.touches[0],
-                    event.touches[1]
-                );
-
-            pinchCenterX = center.x;
-            pinchCenterY = center.y;
-
             return;
         }
 
@@ -1006,13 +1036,8 @@ content.addEventListener(
 
         event.preventDefault();
 
-        /*
-         * PINCH
-         */
 
-        if (
-            event.touches.length === 2
-        ) {
+        if (event.touches.length === 2) {
 
             isPinching = true;
 
@@ -1048,11 +1073,6 @@ content.addEventListener(
             return;
         }
 
-
-        /*
-         * PAN با یک انگشت،
-         * فقط وقتی زوم فعال است.
-         */
 
         if (
             event.touches.length === 1 &&
@@ -1107,11 +1127,6 @@ content.addEventListener(
     "touchend",
     function(event) {
 
-        /*
-         * اگر Pinch تمام شده،
-         * دیگر آن را Swipe حساب نکن.
-         */
-
         if (isPinching) {
 
             if (
@@ -1123,11 +1138,6 @@ content.addEventListener(
 
             return;
         }
-
-        /*
-         * اگر زوم فعال است،
-         * Swipe برای تغییر صفحه نداریم.
-         */
 
         if (zoomLevel > 1) {
             return;
@@ -1160,11 +1170,6 @@ content.addEventListener(
             Math.abs(dx) >
                 Math.abs(dy) * 1.15
         ) {
-
-            /*
-             * Swipe right = صفحه بعد
-             * Swipe left  = صفحه قبل
-             */
 
             if (dx > 0) {
 
@@ -1222,9 +1227,7 @@ async function loadPDF(
             totalPages;
 
         progress.min = 1;
-
-        progress.max =
-            totalPages;
+        progress.max = totalPages;
 
         currentPage =
             Math.max(
@@ -1473,10 +1476,6 @@ document.addEventListener(
             );
         }
 
-        /*
-         * Escape = برگشت از زوم
-         */
-
         if (
             event.key === "Escape" &&
             zoomLevel > 1
@@ -1566,20 +1565,12 @@ async function handleOrientationChange() {
         currentOrientation
     ) {
 
-        /*
-         * شماره صفحه فعلی حفظ می‌شود.
-         */
-
         await loadPDF(
             newOrientation,
             currentPage
         );
 
     } else {
-
-        /*
-         * فقط اندازه صفحه عوض شده.
-         */
 
         if (pdfDocument) {
 
