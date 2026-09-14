@@ -24,8 +24,8 @@
 :root {
 
   /* حالت روز - بنفش و لیمویی */
-  --bg-main: #12051f;
-  --bg-secondary: #1c0a2d;
+  --bg-main: ##FCE456;
+  --bg-secondary: #d4ff72;
 
   --purple: #BFB680;
   --purple-light:#FCE456;
@@ -75,26 +75,11 @@ body {
     sans-serif;
 
   color: var(--text-main);
-
-  background:
-
-    radial-gradient(
-      circle at 15% 15%,
-      rgba(124,58,237,0.30),
-      transparent 35%
-    ),
-
-    radial-gradient(
-      circle at 85% 85%,
-      rgba(183,243,74,0.13),
-      transparent 32%
-    ),
-
-    linear-gradient(
-      135deg,
-      var(--bg-main),
-      var(--bg-secondary)
-    );
+background: linear-gradient(
+  135deg,
+  var(--bg-main),
+  var(--bg-secondary)
+);
 
   transition:
     background 0.35s ease,
