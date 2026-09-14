@@ -6,15 +6,38 @@
 
   <title>Digital Book</title>
 
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
   <style>
+
     :root{
       --purple:#7c3aed;
       --violet:#a855f7;
       --yellow:#6303b2;
+
       --background:#090714;
+      --background2:#120b24;
+
       --panel:rgba(255,255,255,.10);
       --border:rgba(255,255,255,.22);
+
+      --text:#ffffff;
+
+      --book:#ffffff;
     }
+
+
+    body.light{
+      --background:#f3f0fa;
+      --background2:#ddd5ee;
+
+      --panel:rgba(255,255,255,.72);
+      --border:rgba(80,50,120,.20);
+
+      --text:#20152e;
+    }
+
 
     *{
       box-sizing:border-box;
@@ -22,206 +45,413 @@
       padding:0;
     }
 
+
     html,
     body{
       width:100%;
       height:100%;
     }
 
+
     body{
-      font-family:Arial, Tahoma, sans-serif;
+      font-family:Arial,Tahoma,sans-serif;
+
       background:
-        radial-gradient(circle at 20% 10%, rgba(124,58,237,.28), transparent 35%),
-        radial-gradient(circle at 80% 90%, rgba(168,85,247,.20), transparent 35%),
-        linear-gradient(135deg,#090714,#120b24,#090714);
-      color:white;
+        radial-gradient(
+          circle at 20% 10%,
+          rgba(124,58,237,.28),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at 80% 90%,
+          rgba(168,85,247,.20),
+          transparent 35%
+        ),
+        linear-gradient(
+          135deg,
+          var(--background),
+          var(--background2),
+          var(--background)
+        );
+
+      color:var(--text);
+
       overflow:hidden;
+
+      transition:
+        background .3s ease,
+        color .3s ease;
     }
+
 
     #app{
       width:100%;
       height:100%;
+
       display:flex;
       flex-direction:column;
+
       align-items:center;
       justify-content:center;
+
       gap:18px;
+
       padding:12px;
     }
+
+
+    /* BOOK */
 
     .book-wrap{
       width:min(1250px,99vw);
       height:min(78vh,760px);
+
       display:flex;
       align-items:center;
       justify-content:center;
     }
+
 
     .book{
       width:100%;
       height:100%;
-      background:#fff;
-      border:1px solid rgba(255,255,255,.35);
+
+      background:var(--book);
+
+      border:
+        1px solid rgba(255,255,255,.35);
+
       border-radius:10px;
+
       overflow:hidden;
+
       box-shadow:
         0 25px 70px rgba(0,0,0,.55),
         0 0 35px rgba(124,58,237,.18);
+
       position:relative;
     }
+
 
     .page{
       width:100%;
       height:100%;
+
       background:white;
+
       overflow:hidden;
     }
+
 
     .page-inner{
       width:100%;
       height:100%;
+
       padding:1px;
+
       overflow:hidden;
+
       background:white;
     }
+
 
     #content{
       width:100%;
       height:100%;
+
       overflow:hidden;
+
       position:relative;
-      background:white;
-    }
 
-    .pdf-frame{
-      width:100%;
-      height:100%;
-      border:0;
-      display:block;
       background:white;
-    }
 
-    .controls{
-      width:min(700px,95vw);
-      min-height:62px;
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:18px;
-      padding:10px 16px;
-      border:1px solid var(--border);
+    }
+
+
+    #pdfCanvas{
+      display:block;
+
+      max-width:100%;
+      max-height:100%;
+
+      background:white;
+
+      user-select:none;
+      -webkit-user-select:none;
+
+      touch-action:none;
+    }
+
+
+    /* LOADING */
+
+    #loading{
+      position:absolute;
+
+      inset:0;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      background:white;
+
+      color:#333;
+
+      font-size:15px;
+
+      z-index:5;
+    }
+
+
+    /* CONTROLS */
+
+    .controls{
+      width:min(760px,95vw);
+
+      min-height:62px;
+
+      display:flex;
+
+      align-items:center;
+      justify-content:center;
+
+      gap:12px;
+
+      padding:10px 14px;
+
+      border:
+        1px solid var(--border);
+
       border-radius:18px;
+
       background:
         linear-gradient(
           135deg,
           rgba(255,255,255,.13),
           rgba(255,255,255,.06)
         );
+
       backdrop-filter:blur(14px);
       -webkit-backdrop-filter:blur(14px);
-      box-shadow:0 12px 40px rgba(0,0,0,.35);
+
+      box-shadow:
+        0 12px 40px rgba(0,0,0,.35);
     }
+
+
+    /* NAVIGATION */
 
     .nav{
       width:44px;
       height:44px;
-      border:1px solid rgba(255,255,255,.25);
+
+      flex-shrink:0;
+
+      border:
+        1px solid rgba(255,255,255,.25);
+
       border-radius:12px;
-      background:rgba(255,255,255,.10);
+
+      background:
+        rgba(255,255,255,.10);
+
       color:white;
+
       font-size:34px;
       line-height:1;
+
       cursor:pointer;
+
       display:flex;
       align-items:center;
       justify-content:center;
+
       transition:.2s;
+
       user-select:none;
     }
 
+
     .nav:hover{
-      background:rgba(255,255,255,.18);
+      background:
+        rgba(255,255,255,.18);
+
       transform:scale(1.05);
     }
+
 
     .nav:active{
       transform:scale(.96);
     }
 
+
     .nav:disabled{
-      opacity:.4;
+      opacity:.35;
+
       cursor:default;
+
       transform:none;
     }
 
+
+    /* PROGRESS */
+
     .progress-box{
       flex:1;
+
       max-width:500px;
+
       display:flex;
+
       align-items:center;
-      gap:14px;
+
+      gap:12px;
     }
+
 
     #progress{
       flex:1;
+
       accent-color:var(--violet);
+
       cursor:pointer;
     }
 
+
     .counter{
       min-width:70px;
+
       text-align:center;
+
       font-size:14px;
-      color:rgba(255,255,255,.9);
+
+      color:var(--text);
+
       direction:ltr;
+
       white-space:nowrap;
     }
+
+
+    /* NIGHT / DAY */
+
+    #themeButton{
+      width:44px;
+      height:44px;
+
+      flex-shrink:0;
+
+      border:
+        1px solid rgba(255,255,255,.25);
+
+      border-radius:12px;
+
+      background:
+        rgba(255,255,255,.10);
+
+      color:var(--text);
+
+      font-size:21px;
+
+      cursor:pointer;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      transition:.2s;
+    }
+
+
+    #themeButton:hover{
+      background:
+        rgba(255,255,255,.18);
+
+      transform:scale(1.05);
+    }
+
+
+    /* MOBILE */
 
     @media(max-width:700px){
 
       #app{
         gap:10px;
+
         padding:6px;
       }
 
+
       .book-wrap{
         width:100%;
-        height:calc(100vh - 90px);
+
+        height:
+          calc(100vh - 90px);
       }
+
 
       .book{
         border-radius:7px;
       }
 
+
       .controls{
         width:96vw;
+
         min-height:54px;
-        gap:10px;
-        padding:7px 10px;
+
+        gap:7px;
+
+        padding:7px 8px;
+
         border-radius:14px;
       }
 
-      .nav{
+
+      .nav,
+      #themeButton{
         width:38px;
         height:38px;
+      }
+
+
+      .nav{
         font-size:29px;
       }
 
-      .progress-box{
-        gap:8px;
+
+      #themeButton{
+        font-size:18px;
       }
+
+
+      .progress-box{
+        gap:7px;
+      }
+
 
       .counter{
         min-width:52px;
+
         font-size:12px;
       }
+
     }
+
   </style>
 </head>
+
 
 <body>
 
   <div id="app">
+
+
+    <!-- BOOK -->
 
     <div class="book-wrap">
 
@@ -233,11 +463,11 @@
 
             <div id="content">
 
-              <iframe
-                id="pdfFrame"
-                class="pdf-frame"
-                title="Digital Book">
-              </iframe>
+              <div id="loading">
+                در حال بارگذاری...
+              </div>
+
+              <canvas id="pdfCanvas"></canvas>
 
             </div>
 
@@ -250,15 +480,24 @@
     </div>
 
 
+    <!-- CONTROLS -->
+
     <div class="controls">
+
+
+      <!-- PREVIOUS -->
 
       <button
         class="nav"
         id="prev"
         aria-label="صفحه قبل">
+
         ‹
+
       </button>
 
+
+      <!-- PROGRESS -->
 
       <div class="progress-box">
 
@@ -271,10 +510,13 @@
           step="1"
           aria-label="شماره صفحه">
 
+
         <div class="counter">
 
           <span id="current">1</span>
+
           /
+
           <span id="total">30</span>
 
         </div>
@@ -282,12 +524,28 @@
       </div>
 
 
+      <!-- NEXT -->
+
       <button
         class="nav"
         id="next"
         aria-label="صفحه بعد">
+
         ›
+
       </button>
+
+
+      <!-- NIGHT / DAY -->
+
+      <button
+        id="themeButton"
+        aria-label="تغییر حالت شب و روز">
+
+        ☀
+
+      </button>
+
 
     </div>
 
@@ -296,7 +554,13 @@
 
   <script>
 
+    /* =========================
+       SETTINGS
+    ========================= */
+
+
     const TOTAL_PAGES = 30;
+
 
     const PDF_URL =
       "https://mohammabali126-hash.github.io/digital-book/ppt/PC/pc.pdf";
@@ -305,40 +569,126 @@
     let currentPage = 1;
 
 
-    const pdfFrame =
-      document.getElementById("pdfFrame");
+    /* =========================
+       ELEMENTS
+    ========================= */
+
+
+    const canvas =
+      document.getElementById("pdfCanvas");
+
+
+    const ctx =
+      canvas.getContext("2d");
+
+
+    const content =
+      document.getElementById("content");
+
+
+    const loading =
+      document.getElementById("loading");
+
 
     const prev =
       document.getElementById("prev");
 
+
     const next =
       document.getElementById("next");
+
 
     const progress =
       document.getElementById("progress");
 
+
     const current =
       document.getElementById("current");
+
 
     const total =
       document.getElementById("total");
 
 
-    total.textContent = TOTAL_PAGES;
+    const themeButton =
+      document.getElementById("themeButton");
 
 
-    function showPage(pageNumber){
+    total.textContent =
+      TOTAL_PAGES;
+
+
+    /* =========================
+       PDF.JS
+    ========================= */
+
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+
+    let pdfDocument = null;
+
+
+    /* =========================
+       LOAD PDF
+    ========================= */
+
+
+    async function loadPDF(){
+
+      try{
+
+        pdfDocument =
+          await pdfjsLib.getDocument(
+            PDF_URL
+          ).promise;
+
+
+        loading.style.display =
+          "none";
+
+
+        showPage(1);
+
+      }
+
+      catch(error){
+
+        loading.textContent =
+          "خطا در بارگذاری PDF";
+
+        console.error(error);
+
+      }
+
+    }
+
+
+    /* =========================
+       RENDER PAGE
+    ========================= */
+
+
+    async function showPage(pageNumber){
+
+      if(!pdfDocument){
+        return;
+      }
+
 
       if(pageNumber < 1){
         pageNumber = 1;
       }
+
 
       if(pageNumber > TOTAL_PAGES){
         pageNumber = TOTAL_PAGES;
       }
 
 
-      currentPage = pageNumber;
+      currentPage =
+        pageNumber;
 
 
       current.textContent =
@@ -357,20 +707,135 @@
         currentPage === TOTAL_PAGES;
 
 
-      pdfFrame.src =
-        PDF_URL +
-        "#page=" +
+      loading.style.display =
+        "flex";
+
+
+      loading.textContent =
+        "در حال بارگذاری صفحه " +
         currentPage +
-        "&zoom=page-fit";
+        "...";
+
+
+      try{
+
+        const page =
+          await pdfDocument.getPage(
+            currentPage
+          );
+
+
+        const baseViewport =
+          page.getViewport({
+            scale:1
+          });
+
+
+        const availableWidth =
+          content.clientWidth - 2;
+
+
+        const availableHeight =
+          content.clientHeight - 2;
+
+
+        const scaleX =
+          availableWidth /
+          baseViewport.width;
+
+
+        const scaleY =
+          availableHeight /
+          baseViewport.height;
+
+
+        const scale =
+          Math.min(
+            scaleX,
+            scaleY
+          );
+
+
+        const viewport =
+          page.getViewport({
+            scale:scale
+          });
+
+
+        const deviceScale =
+          window.devicePixelRatio || 1;
+
+
+        canvas.width =
+          Math.floor(
+            viewport.width *
+            deviceScale
+          );
+
+
+        canvas.height =
+          Math.floor(
+            viewport.height *
+            deviceScale
+          );
+
+
+        canvas.style.width =
+          viewport.width + "px";
+
+
+        canvas.style.height =
+          viewport.height + "px";
+
+
+        ctx.setTransform(
+          deviceScale,
+          0,
+          0,
+          deviceScale,
+          0,
+          0
+        );
+
+
+        await page.render({
+
+          canvasContext:ctx,
+
+          viewport:viewport
+
+        }).promise;
+
+
+        loading.style.display =
+          "none";
+
+      }
+
+      catch(error){
+
+        loading.textContent =
+          "خطا در نمایش صفحه";
+
+        console.error(error);
+
+      }
 
     }
+
+
+    /* =========================
+       BUTTONS
+    ========================= */
 
 
     prev.addEventListener(
       "click",
       function(){
 
-        showPage(currentPage - 1);
+        showPage(
+          currentPage - 1
+        );
 
       }
     );
@@ -380,7 +845,9 @@
       "click",
       function(){
 
-        showPage(currentPage + 1);
+        showPage(
+          currentPage + 1
+        );
 
       }
     );
@@ -396,6 +863,11 @@
 
       }
     );
+
+
+    /* =========================
+       KEYBOARD
+    ========================= */
 
 
     document.addEventListener(
@@ -429,29 +901,139 @@
     );
 
 
+    /* =========================
+       SWIPE
+    ========================= */
+
+
     let touchStartX = 0;
 
 
-    pdfFrame.addEventListener(
-      "load",
+    content.addEventListener(
+      "touchstart",
+      function(event){
+
+        touchStartX =
+          event.changedTouches[0].screenX;
+
+      },
+      {
+        passive:true
+      }
+    );
+
+
+    content.addEventListener(
+      "touchend",
+      function(event){
+
+        const touchEndX =
+          event.changedTouches[0].screenX;
+
+
+        const difference =
+          touchEndX -
+          touchStartX;
+
+
+        if(
+          Math.abs(difference) < 50
+        ){
+          return;
+        }
+
+
+        if(difference < 0){
+
+          showPage(
+            currentPage + 1
+          );
+
+        }
+        else{
+
+          showPage(
+            currentPage - 1
+          );
+
+        }
+
+      },
+      {
+        passive:true
+      }
+    );
+
+
+    /* =========================
+       NIGHT / DAY
+    ========================= */
+
+
+    let isLight =
+      false;
+
+
+    themeButton.addEventListener(
+      "click",
       function(){
 
-        pdfFrame.contentWindow.addEventListener(
-          "touchstart",
-          function(event){
+        isLight =
+          !isLight;
 
-            touchStartX =
-              event.changedTouches[0].screenX;
 
-          },
-          {passive:true}
+        document.body.classList.toggle(
+          "light",
+          isLight
         );
+
+
+        themeButton.textContent =
+          isLight ? "🌙" : "☀";
 
       }
     );
 
 
-    showPage(1);
+    /* =========================
+       RESIZE
+    ========================= */
+
+
+    let resizeTimer;
+
+
+    window.addEventListener(
+      "resize",
+      function(){
+
+        clearTimeout(
+          resizeTimer
+        );
+
+
+        resizeTimer =
+          setTimeout(
+            function(){
+
+              showPage(
+                currentPage
+              );
+
+            },
+            200
+          );
+
+      }
+    );
+
+
+    /* =========================
+       START
+    ========================= */
+
+
+    loadPDF();
 
   </script>
 
