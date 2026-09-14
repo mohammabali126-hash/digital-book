@@ -1,7 +1,5 @@
-```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,309 +29,234 @@
     }
 
     body{
-      overflow:hidden;
-      font-family:Arial,"Segoe UI",Tahoma,sans-serif;
-
+      font-family:Arial, Tahoma, sans-serif;
       background:
-        radial-gradient(
-          ellipse 75% 55% at 15% 10%,
-          rgba(159,76,242,.565),
-          transparent 65%
-        ),
-        radial-gradient(
-          ellipse 70% 55% at 88% 18%,
-          rgba(178,105,255,.18),
-          transparent 68%
-        ),
-        radial-gradient(
-          ellipse 60% 45% at 82% 100%,
-          rgba(255,215,70,.16),
-          transparent 65%
-        ),
-        linear-gradient(
-          135deg,
-          #f3efff 0%,
-          #eee9ff 35%,
-          #f8f5ff 68%,
-          #fff8df 100%
-        );
-
+        radial-gradient(circle at 20% 10%, rgba(124,58,237,.28), transparent 35%),
+        radial-gradient(circle at 80% 90%, rgba(168,85,247,.20), transparent 35%),
+        linear-gradient(135deg,#090714,#120b24,#090714);
       color:white;
+      overflow:hidden;
     }
 
     #app{
       width:100%;
       height:100%;
-
       display:flex;
       flex-direction:column;
       align-items:center;
       justify-content:center;
-
-      gap:14px;
-      padding:14px;
+      gap:18px;
+      padding:12px;
     }
 
     .book-wrap{
       width:min(1250px,99vw);
       height:min(78vh,760px);
-
-      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
 
     .book{
       width:100%;
       height:100%;
-
-      position:relative;
-      overflow:hidden;
-
       background:#fff;
-
-      border:1px solid rgba(255,255,255,.8);
+      border:1px solid rgba(255,255,255,.35);
       border-radius:10px;
-
+      overflow:hidden;
       box-shadow:
-        0 24px 70px rgba(0,0,0,.45),
-        0 0 45px rgba(124,58,237,.18);
-
-      touch-action:pan-y;
+        0 25px 70px rgba(0,0,0,.55),
+        0 0 35px rgba(124,58,237,.18);
+      position:relative;
     }
 
     .page{
-      position:absolute;
-      inset:0;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      background:#fff;
-
-      user-select:none;
-
-      will-change:transform,opacity;
+      width:100%;
+      height:100%;
+      background:white;
+      overflow:hidden;
     }
 
     .page-inner{
       width:100%;
       height:100%;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
       padding:1px;
       overflow:hidden;
+      background:white;
     }
 
-    .media-page{
+    #content{
       width:100%;
       height:100%;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
       overflow:hidden;
-      background:#fff;
+      position:relative;
+      background:white;
     }
 
-    .ppt-frame{
+    .pdf-frame{
       width:100%;
       height:100%;
-
       border:0;
       display:block;
-
-      background:#fff;
-    }
-
-    .placeholder{
-      color:#888;
-      font-size:22px;
-      text-align:center;
+      background:white;
     }
 
     .controls{
-      width:min(1250px,99vw);
-
-      min-height:58px;
-
-      padding:7px 10px;
-
+      width:min(700px,95vw);
+      min-height:62px;
       display:flex;
       align-items:center;
-
-      gap:10px;
-
+      justify-content:center;
+      gap:18px;
+      padding:10px 16px;
       border:1px solid var(--border);
-      border-radius:16px;
-
+      border-radius:18px;
       background:
         linear-gradient(
           135deg,
-          rgba(165,124,234,.863),
-          rgba(204,198,208,.767) 50%,
-          rgba(255,217,0,.884)
+          rgba(255,255,255,.13),
+          rgba(255,255,255,.06)
         );
-
-      backdrop-filter:blur(18px);
-      -webkit-backdrop-filter:blur(18px);
-
-      box-shadow:
-        0 10px 35px rgba(0,0,0,.28),
-        inset 0 1px 0 rgba(255,255,255,.14);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      box-shadow:0 12px 40px rgba(0,0,0,.35);
     }
 
     .nav{
       width:44px;
       height:44px;
-
-      flex:0 0 44px;
-
       border:1px solid rgba(255,255,255,.25);
       border-radius:12px;
-
-      background:rgba(255,255,255,.12);
-
+      background:rgba(255,255,255,.10);
       color:white;
-
-      font-size:32px;
+      font-size:34px;
       line-height:1;
-
       cursor:pointer;
-
       display:flex;
       align-items:center;
       justify-content:center;
-
-      transition:
-        transform .12s ease,
-        background .15s ease;
+      transition:.2s;
+      user-select:none;
     }
 
     .nav:hover{
-      background:rgba(255,255,255,.20);
+      background:rgba(255,255,255,.18);
+      transform:scale(1.05);
     }
 
     .nav:active{
-      transform:scale(.94);
-      background:rgba(8,5,95,.18);
+      transform:scale(.96);
     }
 
     .progress-box{
       flex:1;
-
+      max-width:500px;
       display:flex;
-      flex-direction:column;
       align-items:center;
-      justify-content:center;
-
-      gap:3px;
+      gap:14px;
     }
 
     #progress{
-      width:100%;
-
-      accent-color:var(--yellow);
-
+      flex:1;
+      accent-color:var(--violet);
       cursor:pointer;
     }
 
     .counter{
-      color:white;
-
-      font-size:13px;
-
+      min-width:70px;
+      text-align:center;
+      font-size:14px;
+      color:rgba(255,255,255,.9);
       direction:ltr;
+      white-space:nowrap;
+    }
 
-      text-shadow:
-        0 1px 3px rgba(0,0,0,.35);
+    .page-loading{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:white;
+      color:#333;
+      font-size:15px;
+      z-index:2;
     }
 
     @media(max-width:700px){
 
       #app{
-        padding:8px;
-        gap:9px;
+        gap:10px;
+        padding:6px;
       }
 
       .book-wrap{
-        height:calc(100vh - 100px);
+        width:100%;
+        height:calc(100vh - 90px);
+      }
+
+      .book{
+        border-radius:7px;
       }
 
       .controls{
-        min-height:52px;
-        padding:5px 7px;
+        width:96vw;
+        min-height:54px;
+        gap:10px;
+        padding:7px 10px;
+        border-radius:14px;
       }
 
       .nav{
         width:38px;
         height:38px;
-
-        flex-basis:38px;
-
-        font-size:28px;
+        font-size:29px;
       }
 
-      .page-inner{
-        padding:1px;
+      .progress-box{
+        gap:8px;
       }
-    }
 
-    @media(max-width:700px) and (orientation:portrait){
-
-      .book-wrap{
-        width:100%;
-        height:calc(100vh - 100px);
-      }
-    }
-
-    @media(min-width:701px) and (orientation:landscape){
-
-      .book-wrap{
-        width:min(1250px,99vw);
-        height:min(78vh,760px);
+      .counter{
+        min-width:52px;
+        font-size:12px;
       }
     }
   </style>
 </head>
-
 
 <body>
 
   <div id="app">
 
     <div class="book-wrap">
-
       <div id="book" class="book">
 
         <div id="page" class="page">
 
           <div class="page-inner">
 
-            <div id="content" class="media-page"></div>
+            <div id="content">
+              <div class="page-loading">
+                در حال بارگذاری...
+              </div>
+            </div>
 
           </div>
 
         </div>
 
       </div>
-
     </div>
-
 
     <div class="controls">
 
       <button
         class="nav"
         id="prev"
-        aria-label="صفحه قبل"
-      >
+        aria-label="صفحه قبل">
         ‹
       </button>
-
 
       <div class="progress-box">
 
@@ -344,27 +267,20 @@
           max="30"
           value="1"
           step="1"
-          aria-label="شماره صفحه"
-        >
+          aria-label="شماره صفحه">
 
         <div class="counter">
-
           <span id="current">1</span>
-
           /
-
           <span id="total">30</span>
-
         </div>
 
       </div>
 
-
       <button
         class="nav"
         id="next"
-        aria-label="صفحه بعد"
-      >
+        aria-label="صفحه بعد">
         ›
       </button>
 
@@ -375,48 +291,23 @@
 
   <script>
 
-    /* =========================
-       تنظیمات اصلی
-    ========================= */
-
     const TOTAL_PAGES = 30;
+
+    const PDF_URL =
+      "https://mohammabali126-hash.github.io/digital-book/ppt/PC/pc.pdf";
+
 
     let currentPage = 1;
 
 
-    /*
-      مسیر PowerPoint کامپیوتر
-
-      ساختار پوشه:
-
-      digital-book/
-      ├── index.html
-      └── ppt/
-          └── PC/
-              └── pc.pptx
-    */
-
-    const PPT_PC_URL = "ppt/PC/pc.pptx";
-
-
-    /*
-      نسخه موبایل فعلاً استفاده نمی‌شود.
-      بعداً اگر خواستیم نسخه موبایل جدا داشته باشیم
-      این قسمت را اضافه می‌کنیم.
-    */
-
-    const PPT_PHONE_URL = "";
-
-
-    /* =========================
-       عناصر صفحه
-    ========================= */
-
-    const page =
-      document.getElementById("page");
-
     const content =
       document.getElementById("content");
+
+    const prev =
+      document.getElementById("prev");
+
+    const next =
+      document.getElementById("next");
 
     const progress =
       document.getElementById("progress");
@@ -427,437 +318,218 @@
     const total =
       document.getElementById("total");
 
-    const prev =
-      document.getElementById("prev");
 
-    const next =
-      document.getElementById("next");
+    total.textContent = TOTAL_PAGES;
 
 
-    total.textContent =
-      TOTAL_PAGES;
-
-    progress.max =
-      TOTAL_PAGES;
-
-
-    /* =========================
-       تمام صفحات فقط PPT
-    ========================= */
-
-    const pages = Array.from(
-      { length: TOTAL_PAGES },
-      () => ({
-        type: "ppt"
-      })
-    );
-
-
-    /* =========================
-       تشخیص موبایل
-    ========================= */
-
-    function isPhone(){
-
-      return window.matchMedia(
-        "(max-width:700px) and (orientation:portrait)"
-      ).matches;
-
-    }
-
-
-    /* =========================
-       انتخاب PPT
-    ========================= */
-
-    function getPptUrl(){
-
-      if(isPhone()){
-
-        /*
-          فعلاً موبایل همان PPT کامپیوتر را می‌گیرد
-          تا نسخه موبایل را بعداً اضافه کنیم.
-        */
-
-        return PPT_PC_URL;
-
-      }
-
-      return PPT_PC_URL;
-
-    }
-
-
-    /* =========================
-       ساخت PowerPoint
-    ========================= */
-
-    function createPowerPoint(){
-
-      const url =
-        getPptUrl();
-
-
-      if(!url){
-
-        const message =
-          document.createElement("div");
-
-        message.className =
-          "placeholder";
-
-        message.textContent =
-          "فایل PowerPoint تعیین نشده است.";
-
-        return message;
-
-      }
-
+    function createPDFFrame(pageNumber){
 
       const frame =
         document.createElement("iframe");
 
+      frame.className = "pdf-frame";
 
-      frame.className =
-        "ppt-frame";
+      frame.allowFullscreen = true;
 
+      frame.loading = "eager";
 
       /*
-        Office Online Viewer
-
-        توجه:
-        برای فایل محلی ممکن است نمایش ندهد.
-        فایل باید در حالت نهایی روی یک آدرس
-        اینترنتی قابل دسترسی باشد.
+        page= شماره صفحه PDF
+        zoom=page-fit باعث می‌شود
+        صفحه تا حد ممکن داخل قاب جا شود.
       */
 
       frame.src =
-        "https://view.officeapps.live.com/op/embed.aspx?src=" +
-        encodeURIComponent(url);
-
-
-      frame.allowFullscreen =
-        true;
-
-
-      frame.loading =
-        "lazy";
-
+        PDF_URL +
+        "#page=" +
+        pageNumber +
+        "&zoom=page-fit";
 
       return frame;
-
     }
 
 
-    /* =========================
-       نمایش صفحه
-    ========================= */
+    function renderPage(pageNumber){
 
-    function renderPage(){
+      content.innerHTML = "";
 
-      const pageData =
-        pages[currentPage - 1];
-
-
-      content.innerHTML =
-        "";
-
-
-      if(!pageData){
-
-        return;
-
-      }
-
-
-      const media =
+      const loading =
         document.createElement("div");
 
-      media.className =
-        "media-page";
+      loading.className =
+        "page-loading";
+
+      loading.textContent =
+        "در حال بارگذاری صفحه " +
+        pageNumber +
+        "...";
+
+      content.appendChild(loading);
 
 
-      if(pageData.type === "ppt"){
-
-        media.appendChild(
-          createPowerPoint()
-        );
-
-      }
+      const frame =
+        createPDFFrame(pageNumber);
 
 
-      content.appendChild(
-        media
+      frame.addEventListener(
+        "load",
+        function(){
+
+          setTimeout(function(){
+
+            if(loading.parentNode){
+              loading.remove();
+            }
+
+          },300);
+
+        }
       );
 
+
+      content.appendChild(frame);
     }
 
 
-    /* =========================
-       نمایش صفحه با انیمیشن
-    ========================= */
+    function showPage(pageNumber){
 
-    function showPage(
-      number,
-      direction = 1
-    ){
-
-      if(number < 1){
-
-        number = 1;
-
+      if(pageNumber < 1){
+        pageNumber = 1;
       }
 
-
-      if(number > TOTAL_PAGES){
-
-        number = TOTAL_PAGES;
-
+      if(pageNumber > TOTAL_PAGES){
+        pageNumber = TOTAL_PAGES;
       }
 
+      currentPage = pageNumber;
 
-      if(number === currentPage){
+      current.textContent =
+        currentPage;
 
-        renderPage();
+      progress.value =
+        currentPage;
 
-        return;
+      prev.disabled =
+        currentPage === 1;
 
-      }
-
-
-      currentPage =
-        number;
-
-
-      page.style.transition =
-        "transform .22s ease, opacity .22s ease";
+      next.disabled =
+        currentPage === TOTAL_PAGES;
 
 
-      page.style.transform =
-        `translateX(${direction * 35}px)`;
-
-
-      page.style.opacity =
-        "0";
-
-
-      setTimeout(() => {
-
-        renderPage();
-
-
-        progress.value =
-          currentPage;
-
-
-        current.textContent =
-          currentPage;
-
-
-        page.style.transform =
-          `translateX(${-direction * 35}px)`;
-
-
-        requestAnimationFrame(() => {
-
-          page.style.transform =
-            "translateX(0)";
-
-          page.style.opacity =
-            "1";
-
-        });
-
-      }, 120);
-
+      renderPage(currentPage);
     }
 
-
-    /* =========================
-       دکمه قبلی
-    ========================= */
 
     prev.addEventListener(
       "click",
-      () => {
-
-        showPage(
-          currentPage - 1,
-          -1
-        );
-
+      function(){
+        showPage(currentPage - 1);
       }
     );
 
-
-    /* =========================
-       دکمه بعدی
-    ========================= */
 
     next.addEventListener(
       "click",
-      () => {
-
-        showPage(
-          currentPage + 1,
-          1
-        );
-
+      function(){
+        showPage(currentPage + 1);
       }
     );
 
-
-    /* =========================
-       نوار صفحات
-    ========================= */
 
     progress.addEventListener(
       "input",
-      () => {
-
-        const number =
-          Number(progress.value);
-
-
-        const direction =
-          number > currentPage
-            ? 1
-            : -1;
-
-
-        showPage(
-          number,
-          direction
-        );
-
+      function(){
+        showPage(Number(this.value));
       }
     );
 
-
-    /* =========================
-       کیبورد
-    ========================= */
 
     document.addEventListener(
       "keydown",
-      (event) => {
+      function(event){
 
-        if(event.key === "ArrowRight"){
-
-          showPage(
-            currentPage + 1,
-            1
-          );
-
+        if(
+          event.key === "ArrowLeft" ||
+          event.key === "ArrowUp"
+        ){
+          showPage(currentPage - 1);
         }
 
-
-        if(event.key === "ArrowLeft"){
-
-          showPage(
-            currentPage - 1,
-            -1
-          );
-
+        if(
+          event.key === "ArrowRight" ||
+          event.key === "ArrowDown"
+        ){
+          showPage(currentPage + 1);
         }
 
       }
     );
 
 
-    /* =========================
-       Swipe موبایل
-    ========================= */
-
-    let touchStartX =
-      0;
-
-    let touchEndX =
-      0;
+    let touchStartX = 0;
+    let touchEndX = 0;
 
 
-    page.addEventListener(
+    content.addEventListener(
       "touchstart",
-      (event) => {
+      function(event){
 
         touchStartX =
           event.changedTouches[0].screenX;
 
       },
-      { passive:true }
+      {passive:true}
     );
 
 
-    page.addEventListener(
+    content.addEventListener(
       "touchend",
-      (event) => {
+      function(event){
 
         touchEndX =
           event.changedTouches[0].screenX;
-
 
         const difference =
           touchEndX - touchStartX;
 
 
         if(Math.abs(difference) < 50){
-
           return;
-
         }
 
+
+        /*
+          در حالت RTL:
+          کشیدن به چپ → صفحه بعد
+          کشیدن به راست → صفحه قبل
+        */
 
         if(difference < 0){
-
-          showPage(
-            currentPage + 1,
-            1
-          );
-
+          showPage(currentPage + 1);
         }
         else{
-
-          showPage(
-            currentPage - 1,
-            -1
-          );
-
+          showPage(currentPage - 1);
         }
 
       },
-      { passive:true }
+      {passive:true}
     );
 
 
-    /* =========================
-       تغییر اندازه صفحه
-    ========================= */
-
     window.addEventListener(
       "resize",
-      () => {
-
-        renderPage();
-
+      function(){
+        /*
+          PDF viewer خودش اندازه صفحه
+          را با قاب هماهنگ می‌کند.
+        */
       }
     );
 
 
-    /* =========================
-       شروع
-    ========================= */
-
-    renderPage();
-
-    progress.value =
-      currentPage;
-
-    current.textContent =
-      currentPage;
+    showPage(1);
 
   </script>
 
 </body>
-
 </html>
-```
