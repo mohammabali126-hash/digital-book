@@ -54,6 +54,7 @@ body {
     width: 100%;
     height: 100vh;
     padding: 10px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -63,6 +64,7 @@ body {
     width: min(1250px, 99vw);
     flex: 1;
     min-height: 0;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -73,6 +75,7 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+
     border-radius: 18px;
 
     background: rgba(255, 255, 255, 0.88);
@@ -90,9 +93,11 @@ body {
 .page-inner {
     width: 100%;
     height: 100%;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     overflow: hidden;
 }
 
@@ -106,6 +111,7 @@ body {
 #loading {
     position: absolute;
     inset: 0;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -205,12 +211,14 @@ body {
         inset 0 2px 4px rgba(125, 95, 170, 0.10);
 }
 
+/* دکمه‌ها همیشه فعال هستند */
 .control-button:disabled {
-    opacity: 0.42;
-    cursor: default;
+    opacity: 1;
+    cursor: pointer;
 
     box-shadow:
-        0 2px 6px rgba(125, 95, 170, 0.08);
+        0 4px 10px rgba(125, 95, 170, 0.18),
+        inset 0 1px 1px rgba(255, 255, 255, 0.75);
 
     transform: none;
 }
@@ -370,7 +378,6 @@ body {
             class="control-button"
             type="button"
             aria-label="صفحه قبل"
-            disabled
         >
             ‹
         </button>
@@ -416,22 +423,38 @@ body {
 pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
+
 const PHONE_PDF =
     "https://mohammabali126-hash.github.io/digital-book/ppt/Phone/phone.pdf";
 
 const PC_PDF =
     "https://mohammabali126-hash.github.io/digital-book/ppt/PC/pc.pdf";
 
-const canvas = document.getElementById("pdfCanvas");
-const ctx = canvas.getContext("2d");
 
-const loading = document.getElementById("loading");
-const progress = document.getElementById("progress");
-const pageCounter = document.getElementById("pageCounter");
+const canvas =
+    document.getElementById("pdfCanvas");
 
-const prevButton = document.getElementById("prevButton");
-const nextButton = document.getElementById("nextButton");
-const themeButton = document.getElementById("themeButton");
+const ctx =
+    canvas.getContext("2d");
+
+const loading =
+    document.getElementById("loading");
+
+const progress =
+    document.getElementById("progress");
+
+const pageCounter =
+    document.getElementById("pageCounter");
+
+const prevButton =
+    document.getElementById("prevButton");
+
+const nextButton =
+    document.getElementById("nextButton");
+
+const themeButton =
+    document.getElementById("themeButton");
+
 
 let pdfDoc = null;
 let currentPage = 1;
@@ -460,30 +483,41 @@ function getPDFUrl(orientation) {
 }
 
 
-async function loadPDF(orientation, pageToOpen = 1) {
+async function loadPDF(
+    orientation,
+    pageToOpen = 1
+) {
 
-    const pdfURL = getPDFUrl(orientation);
+    const pdfURL =
+        getPDFUrl(orientation);
 
     try {
 
         loading.classList.remove("hidden");
-        loading.textContent = "در حال بارگذاری کتاب...";
+
+        loading.textContent =
+            "در حال بارگذاری کتاب...";
 
         rendering = false;
         pendingPage = null;
 
-        const loadingTask = pdfjsLib.getDocument(pdfURL);
+        const loadingTask =
+            pdfjsLib.getDocument(pdfURL);
 
-        const newPdfDoc = await loadingTask.promise;
+        const newPdfDoc =
+            await loadingTask.promise;
 
-        pdfDoc = newPdfDoc;
+        pdfDoc =
+            newPdfDoc;
 
-        totalPages = pdfDoc.numPages;
+        totalPages =
+            pdfDoc.numPages;
 
-        currentPage = Math.min(
-            Math.max(1, pageToOpen),
-            totalPages
-        );
+        currentPage =
+            Math.min(
+                Math.max(1, pageToOpen),
+                totalPages
+            );
 
         progress.min = 1;
         progress.max = totalPages;
@@ -493,13 +527,17 @@ async function loadPDF(orientation, pageToOpen = 1) {
 
         await showPage(currentPage);
 
-        currentOrientation = orientation;
+        currentOrientation =
+            orientation;
 
         loading.classList.add("hidden");
 
     } catch (error) {
 
-        console.error("PDF loading error:", error);
+        console.error(
+            "PDF loading error:",
+            error
+        );
 
         loading.textContent =
             "خطا در بارگذاری فایل PDF";
@@ -509,11 +547,15 @@ async function loadPDF(orientation, pageToOpen = 1) {
 
 async function showPage(pageNumber) {
 
-    if (!pdfDoc) return;
+    if (!pdfDoc) {
+        return;
+    }
 
     if (rendering) {
 
-        pendingPage = pageNumber;
+        pendingPage =
+            pageNumber;
+
         return;
     }
 
@@ -521,10 +563,15 @@ async function showPage(pageNumber) {
 
     try {
 
-        const page = await pdfDoc.getPage(pageNumber);
+        const page =
+            await pdfDoc.getPage(
+                pageNumber
+            );
 
         const container =
-            document.querySelector(".page-inner");
+            document.querySelector(
+                ".page-inner"
+            );
 
         const containerWidth =
             container.clientWidth;
@@ -538,13 +585,18 @@ async function showPage(pageNumber) {
             });
 
         const scaleX =
-            containerWidth / viewport.width;
+            containerWidth /
+            viewport.width;
 
         const scaleY =
-            containerHeight / viewport.height;
+            containerHeight /
+            viewport.height;
 
         let scale =
-            Math.min(scaleX, scaleY);
+            Math.min(
+                scaleX,
+                scaleY
+            );
 
         scale *= 0.97;
 
@@ -599,9 +651,11 @@ async function showPage(pageNumber) {
             viewport: renderViewport
         }).promise;
 
-        currentPage = pageNumber;
+        currentPage =
+            pageNumber;
 
-        progress.value = currentPage;
+        progress.value =
+            currentPage;
 
         updateControls();
 
@@ -618,7 +672,8 @@ async function showPage(pageNumber) {
 
         if (pendingPage !== null) {
 
-            const nextPage = pendingPage;
+            const nextPage =
+                pendingPage;
 
             pendingPage = null;
 
@@ -631,80 +686,130 @@ async function showPage(pageNumber) {
 function updateControls() {
 
     pageCounter.textContent =
-        currentPage + " / " + totalPages;
+        currentPage +
+        " / " +
+        totalPages;
 
-    prevButton.disabled =
-        currentPage <= 1;
+    /*
+     * عمداً disabled نمی‌کنیم.
+     * هر دو دکمه همیشه فعال می‌مانند.
+     */
 
-    nextButton.disabled =
-        currentPage >= totalPages;
+    prevButton.disabled = false;
+    nextButton.disabled = false;
 
     progress.value =
         currentPage;
 }
 
 
-/* دکمه سمت چپ = صفحه بعد */
-prevButton.addEventListener("click", () => {
+/*
+ * دکمه سمت چپ = صفحه بعد
+ */
 
-    if (currentPage < totalPages) {
-        showPage(currentPage + 1);
-    }
+prevButton.addEventListener(
+    "click",
+    () => {
 
-});
+        if (
+            currentPage <
+            totalPages
+        ) {
 
-
-/* دکمه سمت راست = صفحه قبل */
-nextButton.addEventListener("click", () => {
-
-    if (currentPage > 1) {
-        showPage(currentPage - 1);
-    }
-
-});
-
-
-progress.addEventListener("input", () => {
-
-    const pageNumber =
-        Number(progress.value);
-
-    pageCounter.textContent =
-        pageNumber + " / " + totalPages;
-});
-
-
-progress.addEventListener("change", () => {
-
-    showPage(
-        Number(progress.value)
-    );
-});
-
-
-document.addEventListener("keydown", event => {
-
-    if (
-        event.key === "ArrowLeft" ||
-        event.key === "ArrowUp"
-    ) {
-
-        if (currentPage > 1) {
-            showPage(currentPage - 1);
+            showPage(
+                currentPage + 1
+            );
         }
     }
+);
 
-    if (
-        event.key === "ArrowRight" ||
-        event.key === "ArrowDown"
-    ) {
 
-        if (currentPage < totalPages) {
-            showPage(currentPage + 1);
+/*
+ * دکمه سمت راست = صفحه قبل
+ */
+
+nextButton.addEventListener(
+    "click",
+    () => {
+
+        if (
+            currentPage > 1
+        ) {
+
+            showPage(
+                currentPage - 1
+            );
         }
     }
+);
 
-});
+
+progress.addEventListener(
+    "input",
+    () => {
+
+        const pageNumber =
+            Number(
+                progress.value
+            );
+
+        pageCounter.textContent =
+            pageNumber +
+            " / " +
+            totalPages;
+    }
+);
+
+
+progress.addEventListener(
+    "change",
+    () => {
+
+        showPage(
+            Number(
+                progress.value
+            )
+        );
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "ArrowLeft" ||
+            event.key === "ArrowUp"
+        ) {
+
+            if (
+                currentPage > 1
+            ) {
+
+                showPage(
+                    currentPage - 1
+                );
+            }
+        }
+
+        if (
+            event.key === "ArrowRight" ||
+            event.key === "ArrowDown"
+        ) {
+
+            if (
+                currentPage <
+                totalPages
+            ) {
+
+                showPage(
+                    currentPage + 1
+                );
+            }
+        }
+    }
+);
 
 
 let touchStartX = 0;
@@ -715,7 +820,9 @@ canvas.addEventListener(
     "touchstart",
     event => {
 
-        if (event.touches.length !== 1) {
+        if (
+            event.touches.length !== 1
+        ) {
             return;
         }
 
@@ -733,7 +840,9 @@ canvas.addEventListener(
     "touchend",
     event => {
 
-        if (event.changedTouches.length !== 1) {
+        if (
+            event.changedTouches.length !== 1
+        ) {
             return;
         }
 
@@ -752,24 +861,41 @@ canvas.addEventListener(
 function handleSwipe() {
 
     const difference =
-        touchEndX - touchStartX;
+        touchEndX -
+        touchStartX;
 
     const minimumSwipe = 50;
 
-    if (Math.abs(difference) < minimumSwipe) {
+    if (
+        Math.abs(difference) <
+        minimumSwipe
+    ) {
         return;
     }
 
-    if (difference > 0) {
+    if (
+        difference > 0
+    ) {
 
-        if (currentPage < totalPages) {
-            showPage(currentPage + 1);
+        if (
+            currentPage <
+            totalPages
+        ) {
+
+            showPage(
+                currentPage + 1
+            );
         }
 
     } else {
 
-        if (currentPage > 1) {
-            showPage(currentPage - 1);
+        if (
+            currentPage > 1
+        ) {
+
+            showPage(
+                currentPage - 1
+            );
         }
     }
 }
@@ -779,7 +905,8 @@ themeButton.addEventListener(
     "click",
     function () {
 
-        isLight = !isLight;
+        isLight =
+            !isLight;
 
         if (isLight) {
 
@@ -807,7 +934,8 @@ themeButton.addEventListener(
                 )
             `;
 
-            themeButton.textContent = "☀";
+            themeButton.textContent =
+                "☀";
 
         } else {
 
@@ -839,7 +967,8 @@ themeButton.addEventListener(
                 )
             `;
 
-            themeButton.textContent = "🌙";
+            themeButton.textContent =
+                "🌙";
         }
     }
 );
@@ -853,7 +982,9 @@ function checkOrientation() {
     const newOrientation =
         getOrientation();
 
-    if (currentOrientation === null) {
+    if (
+        currentOrientation === null
+    ) {
 
         loadPDF(
             newOrientation,
@@ -863,7 +994,10 @@ function checkOrientation() {
         return;
     }
 
-    if (newOrientation === currentOrientation) {
+    if (
+        newOrientation ===
+        currentOrientation
+    ) {
 
         if (pdfDoc) {
             showPage(currentPage);
@@ -889,7 +1023,9 @@ window.addEventListener(
     "resize",
     () => {
 
-        clearTimeout(orientationTimer);
+        clearTimeout(
+            orientationTimer
+        );
 
         orientationTimer =
             setTimeout(
@@ -904,7 +1040,9 @@ window.addEventListener(
     "orientationchange",
     () => {
 
-        clearTimeout(orientationTimer);
+        clearTimeout(
+            orientationTimer
+        );
 
         orientationTimer =
             setTimeout(
