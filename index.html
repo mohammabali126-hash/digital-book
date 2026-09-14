@@ -1,340 +1,1144 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
 
-/* =========================================================
-   COLOR SYSTEM
-   ========================================================= */
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-:root {
-  --bg-main: #b985e8;
-  --bg-secondary: #d9b5ff;
+    <title>Digital Book</title>
 
-  --purple: #8b5cf6;
-  --purple-light: #b98cff;
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-  --blue: #7c83ff;
-  --pink: #d88cff;
+    <style>
 
-  --glass: rgba(255,255,255,0.16);
-  --glass-border: rgba(255,255,255,0.30);
+        /* =========================================================
+           COLOR SYSTEM
+        ========================================================= */
 
-  --text-main: #ffffff;
-  --text-secondary: rgba(255,255,255,0.82);
+        :root {
+            --bg-main: #b985e8;
+            --bg-secondary: #d9b5ff;
 
-  --shadow-purple:
-    0 0 35px rgba(139,92,246,0.28);
+            --purple: #8b5cf6;
+            --purple-light: #b98cff;
+            --blue: #7c83ff;
+            --pink: #d88cff;
 
-  --shadow-lime:
-    0 0 25px rgba(255,255,255,0.15);
-}
+            --glass: rgba(255, 255, 255, 0.17);
+            --glass-border: rgba(255, 255, 255, 0.30);
 
+            --text-main: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.86);
 
-/* =========================================================
-   GLOBAL
-   ========================================================= */
-
-* {
-  box-sizing: border-box;
-}
+            --shadow-purple: 0 0 35px rgba(139, 92, 246, 0.28);
+        }
 
-html,
-body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
 
-body {
-  font-family:
-    Arial,
-    Tahoma,
-    sans-serif;
+        /* =========================================================
+           GLOBAL
+        ========================================================= */
 
-  color: var(--text-main);
+        * {
+            box-sizing: border-box;
+        }
 
-  background:
-    radial-gradient(
-      circle at 8% 12%,
-      rgba(255,255,255,0.28),
-      transparent 28%
-    ),
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
 
-    radial-gradient(
-      circle at 88% 18%,
-      rgba(216,140,255,0.42),
-      transparent 30%
-    ),
+        body {
+            font-family: Arial, Tahoma, sans-serif;
 
-    radial-gradient(
-      circle at 78% 90%,
-      rgba(124,131,255,0.35),
-      transparent 32%
-    ),
+            color: var(--text-main);
 
-    linear-gradient(
-      135deg,
-      #9f68dc 0%,
-      #b985e8 42%,
-      #c99bea 100%
-    );
+            background:
+                radial-gradient(
+                    circle at 8% 12%,
+                    rgba(255, 255, 255, 0.30),
+                    transparent 27%
+                ),
 
-  transition:
-    background 0.35s ease,
-    color 0.35s ease;
-}
+                radial-gradient(
+                    circle at 92% 18%,
+                    rgba(226, 157, 255, 0.45),
+                    transparent 30%
+                ),
 
+                radial-gradient(
+                    circle at 82% 88%,
+                    rgba(132, 139, 255, 0.38),
+                    transparent 32%
+                ),
 
-/* =========================================================
-   LIGHT MODE
-   ========================================================= */
+                linear-gradient(
+                    135deg,
+                    #9e68da 0%,
+                    #b984e7 48%,
+                    #c99aea 100%
+                );
 
-body.light {
+            transition:
+                background 0.35s ease,
+                color 0.35s ease;
+        }
 
-  --bg-main: #b985e8;
-  --bg-secondary: #d9b5ff;
 
-  --purple: #8b5cf6;
-  --purple-light: #b98cff;
+        /* =========================================================
+           MAIN APP
+        ========================================================= */
 
-  --blue: #7c83ff;
-  --pink: #d88cff;
+        .app {
+            width: 100%;
+            height: 100%;
 
-  --glass: rgba(255,255,255,0.17);
-  --glass-border: rgba(255,255,255,0.32);
+            display: flex;
+            flex-direction: column;
 
-  --text-main: #ffffff;
-  --text-secondary: rgba(255,255,255,0.86);
+            align-items: center;
+            justify-content: center;
 
-  background:
+            padding: 10px;
+        }
 
-    radial-gradient(
-      circle at 8% 10%,
-      rgba(255,255,255,0.30),
-      transparent 27%
-    ),
 
-    radial-gradient(
-      circle at 92% 18%,
-      rgba(226,157,255,0.45),
-      transparent 30%
-    ),
+        /* =========================================================
+           BOOK WRAPPER
+        ========================================================= */
 
-    radial-gradient(
-      circle at 82% 88%,
-      rgba(132,139,255,0.38),
-      transparent 32%
-    ),
+        .book-wrap {
+            width: min(1250px, 99vw);
+            height: min(78vh, 760px);
 
-    linear-gradient(
-      135deg,
-      #9e68da,
-      #b984e7,
-      #c99aea
-    );
-}
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
 
-/* =========================================================
-   NIGHT MODE
-   ========================================================= */
+        /* =========================================================
+           BOOK
+        ========================================================= */
 
-body:not(.light) {
+        .book {
+            width: 100%;
+            height: 100%;
 
-  --bg-main: #171025;
-  --bg-secondary: #24163b;
+            background: #ffffff;
 
-  --purple: #9b6cff;
-  --purple-light: #b98cff;
+            border-radius: 18px;
 
-  --blue: #727cff;
-  --pink: #c779ff;
+            overflow: hidden;
 
-  --glass: rgba(255,255,255,0.07);
-  --glass-border: rgba(255,255,255,0.13);
+            position: relative;
 
-  --text-main: #eeeeee;
-  --text-secondary: #c9bfd5;
+            box-shadow:
+                0 0 35px rgba(139, 92, 246, 0.20),
+                0 20px 70px rgba(40, 15, 65, 0.25);
+        }
 
-  background:
 
-    radial-gradient(
-      circle at 10% 12%,
-      rgba(139,92,246,0.32),
-      transparent 32%
-    ),
+        /* =========================================================
+           PAGE
+        ========================================================= */
 
-    radial-gradient(
-      circle at 88% 82%,
-      rgba(124,131,255,0.18),
-      transparent 30%
-    ),
+        .page-inner {
+            width: 100%;
+            height: 100%;
 
-    linear-gradient(
-      135deg,
-      #120c1d,
-      #21132f
-    );
-}
+            display: flex;
 
+            align-items: center;
+            justify-content: center;
 
-/* =========================================================
-   BOOK
-   ========================================================= */
+            background: #ffffff;
 
-.book {
-  background: #ffffff;
+            overflow: hidden;
+        }
 
-  border-radius: 18px;
+        #pdfCanvas {
+            display: block;
 
-  overflow: hidden;
+            max-width: 100%;
+            max-height: 100%;
 
-  box-shadow:
-    0 0 35px rgba(139,92,246,0.20),
-    0 20px 70px rgba(40,15,65,0.25);
+            background: #ffffff;
+        }
 
-  position: relative;
-}
 
+        /* =========================================================
+           LOADING
+        ========================================================= */
 
-/* =========================================================
-   CONTROL PANEL
-   ========================================================= */
+        #loading {
+            position: absolute;
 
-.controls {
+            inset: 0;
 
-  width: min(1250px, 99vw);
+            display: flex;
 
-  margin-top: 14px;
+            align-items: center;
+            justify-content: center;
 
-  padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.92);
 
-  display: flex;
+            color: #7b4db3;
 
-  align-items: center;
+            font-size: 18px;
 
-  gap: 10px;
+            z-index: 10;
+        }
 
-  border-radius: 16px;
+        #loading.hidden {
+            display: none;
+        }
 
-  background:
-    rgba(255,255,255,0.17);
 
-  border:
-    1px solid rgba(255,255,255,0.30);
+        /* =========================================================
+           CONTROL PANEL
+        ========================================================= */
 
-  backdrop-filter:
-    blur(20px);
+        .controls {
+            width: min(1250px, 99vw);
 
-  -webkit-backdrop-filter:
-    blur(20px);
+            margin-top: 14px;
 
-  box-shadow:
-    0 12px 35px rgba(65,30,100,0.20);
-}
+            padding: 10px 14px;
 
+            display: flex;
+            align-items: center;
 
-/* =========================================================
-   BUTTONS
-   ========================================================= */
+            gap: 10px;
 
-.control-button {
+            border-radius: 16px;
 
-  border:
-    1px solid rgba(255,255,255,0.28);
+            background: rgba(255, 255, 255, 0.17);
 
-  background:
-    rgba(255,255,255,0.13);
+            border: 1px solid rgba(255, 255, 255, 0.30);
 
-  color: #ffffff;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
 
-  width: 42px;
-  height: 38px;
+            box-shadow:
+                0 12px 35px rgba(65, 30, 100, 0.20);
+        }
 
-  border-radius: 10px;
 
-  cursor: pointer;
+        /* =========================================================
+           BUTTONS
+        ========================================================= */
 
-  font-size: 17px;
+        .control-button {
+            width: 42px;
+            height: 38px;
 
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
-}
+            flex-shrink: 0;
 
+            border-radius: 10px;
 
-.control-button:hover {
+            cursor: pointer;
 
-  background:
-    rgba(255,255,255,0.25);
+            font-size: 17px;
 
-  border-color:
-    rgba(255,255,255,0.50);
+            border: 1px solid rgba(255, 255, 255, 0.28);
 
-  box-shadow:
-    0 0 18px rgba(139,92,246,0.35);
+            background: rgba(255, 255, 255, 0.13);
 
-  transform:
-    translateY(-1px);
-}
+            color: #ffffff;
 
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.2s ease;
+        }
 
-.control-button:disabled {
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.25);
 
-  opacity: 0.35;
+            border-color: rgba(255, 255, 255, 0.50);
 
-  cursor: default;
+            box-shadow:
+                0 0 18px rgba(139, 92, 246, 0.35);
 
-  box-shadow: none;
+            transform: translateY(-1px);
+        }
 
-  transform: none;
-}
+        .control-button:active {
+            transform: translateY(0);
+        }
 
+        .control-button:disabled {
+            opacity: 0.35;
 
-/* =========================================================
-   PROGRESS
-   ========================================================= */
+            cursor: default;
 
-#progress {
+            box-shadow: none;
 
-  flex: 1;
+            transform: none;
+        }
 
-  accent-color:
-    #ffffff;
 
-  cursor: pointer;
-}
+        /* =========================================================
+           PROGRESS
+        ========================================================= */
 
+        #progress {
+            flex: 1;
 
-/* =========================================================
-   PAGE COUNTER
-   ========================================================= */
+            min-width: 50px;
 
-.page-counter {
+            height: 5px;
 
-  min-width: 65px;
+            accent-color: #ffffff;
 
-  text-align: center;
+            cursor: pointer;
+        }
 
-  font-size: 14px;
 
-  color:
-    rgba(255,255,255,0.88);
+        /* =========================================================
+           PAGE COUNTER
+        ========================================================= */
 
-  direction: ltr;
-}
+        .page-counter {
+            min-width: 65px;
 
+            text-align: center;
 
-/* =========================================================
-   THEME BUTTON
-   ========================================================= */
+            font-size: 14px;
 
-#themeButton {
+            color: rgba(255, 255, 255, 0.88);
 
-  color: #ffffff;
+            direction: ltr;
 
-  border-color:
-    rgba(255,255,255,0.32);
-}
+            white-space: nowrap;
+        }
 
+
+        /* =========================================================
+           THEME BUTTON
+        ========================================================= */
+
+        #themeButton {
+            color: #ffffff;
+
+            border-color: rgba(255, 255, 255, 0.32);
+        }
+
+
+        /* =========================================================
+           MOBILE
+        ========================================================= */
+
+        @media (max-width: 700px) {
+
+            .app {
+                padding: 6px;
+            }
+
+            .book-wrap {
+                width: 100%;
+                height: min(76vh, 720px);
+            }
+
+            .book {
+                border-radius: 14px;
+            }
+
+            .controls {
+                width: 100%;
+
+                margin-top: 10px;
+
+                padding: 8px 9px;
+
+                gap: 7px;
+
+                border-radius: 14px;
+            }
+
+            .control-button {
+                width: 40px;
+                height: 36px;
+
+                font-size: 16px;
+            }
+
+            .page-counter {
+                min-width: 58px;
+
+                font-size: 13px;
+            }
+
+            #progress {
+                min-width: 40px;
+            }
+        }
+
+
+        /* =========================================================
+           VERY SMALL SCREENS
+        ========================================================= */
+
+        @media (max-width: 420px) {
+
+            .controls {
+                gap: 5px;
+
+                padding: 7px;
+            }
+
+            .control-button {
+                width: 36px;
+                height: 34px;
+
+                font-size: 15px;
+            }
+
+            .page-counter {
+                min-width: 52px;
+
+                font-size: 12px;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <div class="app">
+
+        <!-- =====================================================
+             BOOK
+        ====================================================== -->
+
+        <div class="book-wrap">
+
+            <div class="book">
+
+                <div class="page-inner">
+
+                    <canvas id="pdfCanvas"></canvas>
+
+                </div>
+
+                <div id="loading">
+                    در حال بارگذاری کتاب...
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             CONTROLS
+        ====================================================== -->
+
+        <div class="controls">
+
+            <button
+                id="prevButton"
+                class="control-button"
+                type="button"
+                aria-label="صفحه قبل">
+                ‹
+            </button>
+
+
+            <input
+                id="progress"
+                type="range"
+                min="1"
+                max="1"
+                value="1"
+                step="1"
+                aria-label="انتخاب صفحه">
+
+
+            <div
+                id="pageCounter"
+                class="page-counter">
+                1 / 1
+            </div>
+
+
+            <button
+                id="nextButton"
+                class="control-button"
+                type="button"
+                aria-label="صفحه بعد">
+                ›
+            </button>
+
+
+            <button
+                id="themeButton"
+                class="control-button"
+                type="button"
+                aria-label="تغییر حالت">
+                ☀
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* =========================================================
+           SETTINGS
+        ========================================================= */
+
+        /*
+           برای نسخه کامپیوتر:
+           BOOK_TYPE = "PC"
+
+           برای نسخه موبایل:
+           BOOK_TYPE = "PHONE"
+        */
+
+        const BOOK_TYPE = "PC";
+
+
+        /* =========================================================
+           PDF URL
+        ========================================================= */
+
+        const PDF_URL =
+            BOOK_TYPE === "PHONE"
+                ? "https://mohammabali126-hash.github.io/digital-book/ppt/Phone/phone.pdf"
+                : "https://mohammabali126-hash.github.io/digital-book/ppt/PC/pc.pdf";
+
+
+        /* =========================================================
+           PDF.JS WORKER
+        ========================================================= */
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+
+        /* =========================================================
+           ELEMENTS
+        ========================================================= */
+
+        const canvas =
+            document.getElementById("pdfCanvas");
+
+        const ctx =
+            canvas.getContext("2d");
+
+        const loading =
+            document.getElementById("loading");
+
+        const progress =
+            document.getElementById("progress");
+
+        const pageCounter =
+            document.getElementById("pageCounter");
+
+        const prevButton =
+            document.getElementById("prevButton");
+
+        const nextButton =
+            document.getElementById("nextButton");
+
+        const themeButton =
+            document.getElementById("themeButton");
+
+
+        /* =========================================================
+           VARIABLES
+        ========================================================= */
+
+        let pdfDoc = null;
+
+        let currentPage = 1;
+
+        let totalPages = 0;
+
+        let rendering = false;
+
+        let pendingPage = null;
+
+        let isLight = true;
+
+
+        /* =========================================================
+           LOAD PDF
+        ========================================================= */
+
+        async function loadPDF() {
+
+            try {
+
+                loading.classList.remove("hidden");
+
+                const loadingTask =
+                    pdfjsLib.getDocument(PDF_URL);
+
+                pdfDoc =
+                    await loadingTask.promise;
+
+                totalPages =
+                    pdfDoc.numPages;
+
+                progress.max =
+                    totalPages;
+
+                progress.value =
+                    currentPage;
+
+                updateControls();
+
+                await showPage(currentPage);
+
+                loading.classList.add("hidden");
+
+            } catch (error) {
+
+                console.error(error);
+
+                loading.textContent =
+                    "خطا در بارگذاری فایل PDF";
+
+            }
+
+        }
+
+
+        /* =========================================================
+           SHOW PAGE
+        ========================================================= */
+
+        async function showPage(pageNumber) {
+
+            if (!pdfDoc) {
+                return;
+            }
+
+            if (rendering) {
+
+                pendingPage =
+                    pageNumber;
+
+                return;
+            }
+
+            rendering = true;
+
+            try {
+
+                const page =
+                    await pdfDoc.getPage(pageNumber);
+
+
+                const container =
+                    document.querySelector(".page-inner");
+
+
+                const containerWidth =
+                    container.clientWidth;
+
+                const containerHeight =
+                    container.clientHeight;
+
+
+                const viewport =
+                    page.getViewport({
+                        scale: 1
+                    });
+
+
+                const scaleX =
+                    containerWidth / viewport.width;
+
+                const scaleY =
+                    containerHeight / viewport.height;
+
+
+                let scale =
+                    Math.min(scaleX, scaleY);
+
+
+                /*
+                   کمی فضای خالی برای جلوگیری از
+                   چسبیدن PDF به لبه‌ها
+                */
+
+                scale *= 0.97;
+
+
+                const devicePixelRatio =
+                    window.devicePixelRatio || 1;
+
+
+                const renderViewport =
+                    page.getViewport({
+                        scale: scale
+                    });
+
+
+                canvas.width =
+                    Math.floor(
+                        renderViewport.width *
+                        devicePixelRatio
+                    );
+
+                canvas.height =
+                    Math.floor(
+                        renderViewport.height *
+                        devicePixelRatio
+                    );
+
+
+                canvas.style.width =
+                    Math.floor(
+                        renderViewport.width
+                    ) + "px";
+
+
+                canvas.style.height =
+                    Math.floor(
+                        renderViewport.height
+                    ) + "px";
+
+
+                ctx.setTransform(
+                    devicePixelRatio,
+                    0,
+                    0,
+                    devicePixelRatio,
+                    0,
+                    0
+                );
+
+
+                ctx.clearRect(
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+
+                await page.render({
+                    canvasContext: ctx,
+                    viewport: renderViewport
+                }).promise;
+
+
+                currentPage =
+                    pageNumber;
+
+                progress.value =
+                    currentPage;
+
+                updateControls();
+
+            } catch (error) {
+
+                console.error(
+                    "PDF render error:",
+                    error
+                );
+
+            } finally {
+
+                rendering = false;
+
+                if (pendingPage !== null) {
+
+                    const nextPage =
+                        pendingPage;
+
+                    pendingPage = null;
+
+                    showPage(nextPage);
+                }
+
+            }
+
+        }
+
+
+        /* =========================================================
+           UPDATE CONTROLS
+        ========================================================= */
+
+        function updateControls() {
+
+            pageCounter.textContent =
+                currentPage + " / " + totalPages;
+
+
+            prevButton.disabled =
+                currentPage <= 1;
+
+
+            nextButton.disabled =
+                currentPage >= totalPages;
+
+
+            progress.value =
+                currentPage;
+
+        }
+
+
+        /* =========================================================
+           PREVIOUS PAGE
+        ========================================================= */
+
+        prevButton.addEventListener(
+            "click",
+            function () {
+
+                if (currentPage > 1) {
+
+                    showPage(
+                        currentPage - 1
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+           NEXT PAGE
+        ========================================================= */
+
+        nextButton.addEventListener(
+            "click",
+            function () {
+
+                if (currentPage < totalPages) {
+
+                    showPage(
+                        currentPage + 1
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+           SLIDER
+        ========================================================= */
+
+        progress.addEventListener(
+            "input",
+            function () {
+
+                const pageNumber =
+                    Number(progress.value);
+
+                pageCounter.textContent =
+                    pageNumber + " / " + totalPages;
+
+            }
+        );
+
+
+        progress.addEventListener(
+            "change",
+            function () {
+
+                const pageNumber =
+                    Number(progress.value);
+
+                showPage(pageNumber);
+
+            }
+        );
+
+
+        /* =========================================================
+           KEYBOARD
+        ========================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "ArrowLeft" ||
+                    event.key === "ArrowUp"
+                ) {
+
+                    if (currentPage > 1) {
+
+                        showPage(
+                            currentPage - 1
+                        );
+
+                    }
+
+                }
+
+
+                if (
+                    event.key === "ArrowRight" ||
+                    event.key === "ArrowDown"
+                ) {
+
+                    if (currentPage < totalPages) {
+
+                        showPage(
+                            currentPage + 1
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+           TOUCH / SWIPE
+        ========================================================= */
+
+        let touchStartX = 0;
+
+        let touchEndX = 0;
+
+
+        canvas.addEventListener(
+            "touchstart",
+            function (event) {
+
+                if (event.touches.length !== 1) {
+                    return;
+                }
+
+                touchStartX =
+                    event.touches[0].clientX;
+
+            },
+            {
+                passive: true
+            }
+        );
+
+
+        canvas.addEventListener(
+            "touchend",
+            function (event) {
+
+                if (event.changedTouches.length !== 1) {
+                    return;
+                }
+
+                touchEndX =
+                    event.changedTouches[0].clientX;
+
+
+                handleSwipe();
+
+            },
+            {
+                passive: true
+            }
+        );
+
+
+        function handleSwipe() {
+
+            const difference =
+                touchEndX - touchStartX;
+
+
+            const minimumSwipe =
+                50;
+
+
+            if (
+                Math.abs(difference) <
+                minimumSwipe
+            ) {
+                return;
+            }
+
+
+            /*
+               RTL:
+               کشیدن به سمت راست = صفحه بعد
+               کشیدن به سمت چپ = صفحه قبل
+            */
+
+            if (difference > 0) {
+
+                if (currentPage < totalPages) {
+
+                    showPage(
+                        currentPage + 1
+                    );
+
+                }
+
+            } else {
+
+                if (currentPage > 1) {
+
+                    showPage(
+                        currentPage - 1
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        /* =========================================================
+           THEME BUTTON
+           
+           توجه:
+           حالت دوم عمداً خیلی تیره نیست.
+           فقط کمی شفافیت و کنتراست تغییر می‌کند.
+        ========================================================= */
+
+        themeButton.addEventListener(
+            "click",
+            function () {
+
+                isLight =
+                    !isLight;
+
+
+                if (isLight) {
+
+                    document.body.style.background =
+                        `
+                        radial-gradient(
+                            circle at 8% 10%,
+                            rgba(255,255,255,0.30),
+                            transparent 27%
+                        ),
+
+                        radial-gradient(
+                            circle at 92% 18%,
+                            rgba(226,157,255,0.45),
+                            transparent 30%
+                        ),
+
+                        radial-gradient(
+                            circle at 82% 88%,
+                            rgba(132,139,255,0.38),
+                            transparent 32%
+                        ),
+
+                        linear-gradient(
+                            135deg,
+                            #9e68da 0%,
+                            #b984e7 48%,
+                            #c99aea 100%
+                        )
+                        `;
+
+                    themeButton.textContent = "☀";
+
+                } else {
+
+                    /*
+                       حالت شب نرم؛
+                       عمداً از مشکی خالص استفاده نشده.
+                    */
+
+                    document.body.style.background =
+                        `
+                        radial-gradient(
+                            circle at 10% 10%,
+                            rgba(177,130,255,0.25),
+                            transparent 28%
+                        ),
+
+                        radial-gradient(
+                            circle at 90% 20%,
+                            rgba(210,145,255,0.25),
+                            transparent 30%
+                        ),
+
+                        radial-gradient(
+                            circle at 80% 85%,
+                            rgba(120,130,255,0.20),
+                            transparent 30%
+                        ),
+
+                        linear-gradient(
+                            135deg,
+                            #392451 0%,
+                            #56336f 50%,
+                            #65437c 100%
+                        )
+                        `;
+
+                    themeButton.textContent = "🌙";
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+           RESIZE
+        ========================================================= */
+
+        let resizeTimer = null;
+
+
+        window.addEventListener(
+            "resize",
+            function () {
+
+                clearTimeout(resizeTimer);
+
+
+                resizeTimer =
+                    setTimeout(
+                        function () {
+
+                            if (pdfDoc) {
+
+                                showPage(
+                                    currentPage
+                                );
+
+                            }
+
+                        },
+                        150
+                    );
+
+            }
+        );
+
+
+        /* =========================================================
+           START
+        ========================================================= */
+
+        loadPDF();
+
+    </script>
+
+</body>
+
+</html>
