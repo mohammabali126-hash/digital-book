@@ -13,10 +13,6 @@
 
 <style>
 
-/* =========================
-   BASE
-========================= */
-
 * {
     box-sizing: border-box;
 }
@@ -320,7 +316,6 @@ body {
     cursor: default;
 
     box-shadow:
-
         0 2px 6px rgba(125, 95, 170, 0.08);
 
     transform: none;
@@ -383,38 +378,92 @@ body {
 @media (max-width: 700px) {
 
     .app {
+
+        width: 100%;
+
+        height: 100dvh;
+
+        min-height: 0;
+
         padding: 6px;
+
+        display: flex;
+
+        flex-direction: column;
     }
+
+
+    /*
+       ارتفاع کتاب طوری تنظیم شده که
+       پنل کنترل همیشه داخل صفحه بماند.
+    */
 
     .book-wrap {
+
         width: 100%;
-        height: min(76vh, 720px);
+
+        height: calc(100dvh - 72px);
+
+        flex: 1 1 auto;
+
+        min-height: 0;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
     }
 
+
     .book {
+
+        width: 100%;
+
+        height: 100%;
+
         border-radius: 14px;
     }
+
+
+    /*
+       پنل کنترل همیشه نمایش داده می‌شود.
+    */
 
     .controls {
 
         width: 100%;
 
-        margin-top: 10px;
+        flex: 0 0 auto;
+
+        margin-top: 8px;
 
         padding: 8px 9px;
 
         gap: 7px;
 
         border-radius: 14px;
+
+        display: flex;
+
+        visibility: visible;
+
+        opacity: 1;
+
+        position: relative;
+
+        z-index: 20;
     }
+
 
     .control-button {
 
         width: 40px;
+
         height: 36px;
 
         font-size: 16px;
     }
+
 
     .page-counter {
 
@@ -423,28 +472,49 @@ body {
         font-size: 13px;
     }
 
+
     #progress {
+
         min-width: 40px;
+
+        display: block;
     }
 }
 
 
 @media (max-width: 420px) {
 
+    .app {
+
+        padding: 5px;
+    }
+
+
+    .book-wrap {
+
+        height: calc(100dvh - 67px);
+    }
+
+
     .controls {
 
         gap: 5px;
 
         padding: 7px;
+
+        margin-top: 6px;
     }
+
 
     .control-button {
 
         width: 36px;
+
         height: 34px;
 
         font-size: 15px;
     }
+
 
     .page-counter {
 
@@ -491,9 +561,7 @@ body {
             class="control-button"
             type="button"
             aria-label="صفحه قبل"
-        >
-            ‹
-        </button>
+        >‹</button>
 
 
         <input
@@ -520,9 +588,7 @@ body {
             class="control-button"
             type="button"
             aria-label="صفحه بعد"
-        >
-            ›
-        </button>
+        >›</button>
 
 
         <button
@@ -530,9 +596,7 @@ body {
             class="control-button"
             type="button"
             aria-label="تغییر حالت"
-        >
-            ☀
-        </button>
+        >☀</button>
 
     </div>
 
@@ -541,17 +605,13 @@ body {
 
 <script>
 
-/* =========================================================
-   PDF.JS
-========================================================= */
-
 pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 
-/* =========================================================
+/* =========================
    PDF PATHS
-========================================================= */
+========================= */
 
 const PHONE_PDF =
     "https://mohammabali126-hash.github.io/digital-book/ppt/Phone/phone.pdf";
@@ -560,9 +620,9 @@ const PC_PDF =
     "https://mohammabali126-hash.github.io/digital-book/ppt/PC/pc.pdf";
 
 
-/* =========================================================
+/* =========================
    ELEMENTS
-========================================================= */
+========================= */
 
 const canvas =
     document.getElementById("pdfCanvas");
@@ -589,9 +649,9 @@ const themeButton =
     document.getElementById("themeButton");
 
 
-/* =========================================================
+/* =========================
    STATE
-========================================================= */
+========================= */
 
 let pdfDoc = null;
 
@@ -605,24 +665,19 @@ let pendingPage = null;
 
 let isLight = true;
 
-
-/*
-    وضعیت فعلی صفحه:
-
-    "PORTRAIT" = عمودی = Phone
-    "LANDSCAPE" = افقی = PC
-*/
-
 let currentOrientation = null;
 
 
-/* =========================================================
-   GET ORIENTATION
-========================================================= */
+/* =========================
+   ORIENTATION
+========================= */
 
 function getOrientation() {
 
-    if (window.innerWidth >= window.innerHeight) {
+    if (
+        window.innerWidth >=
+        window.innerHeight
+    ) {
 
         return "LANDSCAPE";
 
@@ -632,25 +687,29 @@ function getOrientation() {
 }
 
 
-/* =========================================================
-   GET PDF URL
-========================================================= */
+/* =========================
+   PDF URL
+========================= */
 
-function getPDFUrl(orientation) {
+function getPDFUrl(
+    orientation
+) {
 
-    if (orientation === "PORTRAIT") {
+    if (
+        orientation ===
+        "PORTRAIT"
+    ) {
 
         return PHONE_PDF;
-
     }
 
     return PC_PDF;
 }
 
 
-/* =========================================================
+/* =========================
    LOAD PDF
-========================================================= */
+========================= */
 
 async function loadPDF(
     orientation,
@@ -658,20 +717,20 @@ async function loadPDF(
 ) {
 
     const pdfURL =
-        getPDFUrl(orientation);
+        getPDFUrl(
+            orientation
+        );
 
 
     try {
 
-        loading.classList.remove("hidden");
+        loading.classList.remove(
+            "hidden"
+        );
 
         loading.textContent =
             "در حال بارگذاری کتاب...";
 
-
-        /*
-            هنگام تعویض فایل، رندر قبلی را متوقف می‌کنیم.
-        */
 
         rendering = false;
 
@@ -679,16 +738,14 @@ async function loadPDF(
 
 
         const loadingTask =
-            pdfjsLib.getDocument(pdfURL);
+            pdfjsLib.getDocument(
+                pdfURL
+            );
 
 
         const newPdfDoc =
             await loadingTask.promise;
 
-
-        /*
-            فایل جدید با موفقیت لود شده.
-        */
 
         pdfDoc =
             newPdfDoc;
@@ -698,40 +755,40 @@ async function loadPDF(
             pdfDoc.numPages;
 
 
-        /*
-            اگر شماره صفحه در فایل جدید وجود نداشته باشد،
-            به آخرین صفحه موجود می‌رویم.
-        */
-
         currentPage =
             Math.min(
-                Math.max(1, pageToOpen),
+                Math.max(
+                    1,
+                    pageToOpen
+                ),
                 totalPages
             );
 
 
         progress.min = 1;
 
-        progress.max = totalPages;
+        progress.max =
+            totalPages;
 
-        progress.value = currentPage;
+        progress.value =
+            currentPage;
 
 
         updateControls();
 
 
-        /*
-            همان شماره صفحه قبلی را باز می‌کنیم.
-        */
-
-        await showPage(currentPage);
+        await showPage(
+            currentPage
+        );
 
 
         currentOrientation =
             orientation;
 
 
-        loading.classList.add("hidden");
+        loading.classList.add(
+            "hidden"
+        );
 
 
     } catch (error) {
@@ -747,11 +804,13 @@ async function loadPDF(
 }
 
 
-/* =========================================================
+/* =========================
    SHOW PAGE
-========================================================= */
+========================= */
 
-async function showPage(pageNumber) {
+async function showPage(
+    pageNumber
+) {
 
     if (!pdfDoc) return;
 
@@ -771,11 +830,15 @@ async function showPage(pageNumber) {
     try {
 
         const page =
-            await pdfDoc.getPage(pageNumber);
+            await pdfDoc.getPage(
+                pageNumber
+            );
 
 
         const container =
-            document.querySelector(".page-inner");
+            document.querySelector(
+                ".page-inner"
+            );
 
 
         const containerWidth =
@@ -813,7 +876,8 @@ async function showPage(pageNumber) {
 
 
         const devicePixelRatio =
-            window.devicePixelRatio || 1;
+            window.devicePixelRatio ||
+            1;
 
 
         const renderViewport =
@@ -908,8 +972,7 @@ async function showPage(pageNumber) {
                 pendingPage;
 
 
-            pendingPage =
-                null;
+            pendingPage = null;
 
 
             showPage(
@@ -920,9 +983,9 @@ async function showPage(pageNumber) {
 }
 
 
-/* =========================================================
+/* =========================
    CONTROLS
-========================================================= */
+========================= */
 
 function updateControls() {
 
@@ -945,9 +1008,9 @@ function updateControls() {
 }
 
 
-/* =========================================================
+/* =========================
    PREVIOUS
-========================================================= */
+========================= */
 
 prevButton.addEventListener(
     "click",
@@ -965,16 +1028,17 @@ prevButton.addEventListener(
 );
 
 
-/* =========================================================
+/* =========================
    NEXT
-========================================================= */
+========================= */
 
 nextButton.addEventListener(
     "click",
     function () {
 
         if (
-            currentPage < totalPages
+            currentPage <
+            totalPages
         ) {
 
             showPage(
@@ -985,9 +1049,9 @@ nextButton.addEventListener(
 );
 
 
-/* =========================================================
+/* =========================
    SLIDER
-========================================================= */
+========================= */
 
 progress.addEventListener(
     "input",
@@ -1024,9 +1088,9 @@ progress.addEventListener(
 );
 
 
-/* =========================================================
+/* =========================
    KEYBOARD
-========================================================= */
+========================= */
 
 document.addEventListener(
     "keydown",
@@ -1054,7 +1118,8 @@ document.addEventListener(
         ) {
 
             if (
-                currentPage < totalPages
+                currentPage <
+                totalPages
             ) {
 
                 showPage(
@@ -1066,9 +1131,9 @@ document.addEventListener(
 );
 
 
-/* =========================================================
+/* =========================
    TOUCH SWIPE
-========================================================= */
+========================= */
 
 let touchStartX = 0;
 
@@ -1123,8 +1188,7 @@ function handleSwipe() {
         touchStartX;
 
 
-    const minimumSwipe =
-        50;
+    const minimumSwipe = 50;
 
 
     if (
@@ -1138,7 +1202,8 @@ function handleSwipe() {
     ) {
 
         if (
-            currentPage < totalPages
+            currentPage <
+            totalPages
         ) {
 
             showPage(
@@ -1160,9 +1225,9 @@ function handleSwipe() {
 }
 
 
-/* =========================================================
+/* =========================
    THEME
-========================================================= */
+========================= */
 
 themeButton.addEventListener(
     "click",
@@ -1248,9 +1313,9 @@ themeButton.addEventListener(
 );
 
 
-/* =========================================================
-   AUTOMATIC ORIENTATION DETECTION
-========================================================= */
+/* =========================
+   ORIENTATION
+========================= */
 
 let orientationTimer = null;
 
@@ -1260,11 +1325,6 @@ function checkOrientation() {
     const newOrientation =
         getOrientation();
 
-
-    /*
-        اگر اولین بار است،
-        PDF مناسب را باز کن.
-    */
 
     if (
         currentOrientation === null
@@ -1278,11 +1338,6 @@ function checkOrientation() {
         return;
     }
 
-
-    /*
-        اگر جهت صفحه واقعاً عوض نشده،
-        فقط اندازه PDF را دوباره تنظیم کن.
-    */
 
     if (
         newOrientation ===
@@ -1300,13 +1355,6 @@ function checkOrientation() {
     }
 
 
-    /*
-        اینجا جهت واقعاً عوض شده است.
-
-        مهم:
-        شماره صفحه فعلی را نگه می‌داریم.
-    */
-
     const pageToKeep =
         currentPage;
 
@@ -1315,11 +1363,6 @@ function checkOrientation() {
         newOrientation;
 
 
-    /*
-        فایل جدید را باز می‌کنیم
-        و همان صفحه قبلی را نمایش می‌دهیم.
-    */
-
     loadPDF(
         newOrientation,
         pageToKeep
@@ -1327,9 +1370,9 @@ function checkOrientation() {
 }
 
 
-/* =========================================================
-   RESIZE / ROTATION
-========================================================= */
+/* =========================
+   RESIZE
+========================= */
 
 window.addEventListener(
     "resize",
@@ -1353,10 +1396,9 @@ window.addEventListener(
 );
 
 
-/*
-    بعضی موبایل‌ها رویداد orientationchange
-    را بهتر از resize گزارش می‌کنند.
-*/
+/* =========================
+   ORIENTATION CHANGE
+========================= */
 
 window.addEventListener(
     "orientationchange",
@@ -1380,9 +1422,9 @@ window.addEventListener(
 );
 
 
-/* =========================================================
+/* =========================
    START
-========================================================= */
+========================= */
 
 checkOrientation();
 
