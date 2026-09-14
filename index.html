@@ -1,1215 +1,788 @@
 <!DOCTYPE html>
+
 <html lang="fa" dir="rtl">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
-
-<title>Digital Book</title>
-
-<!-- PDF.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
-<style>
-
-/* =========================================================
-   COLORS
-   ========================================================= */
-
-:root {
-
-  /* حالت روز - بنفش و لیمویی */
-  --bg-main: #12051f;
-  --bg-secondary: #1c0a2d;
-
-  --purple: #7c3aed;
-  --purple-light: #a855f7;
-
-  --lime: #b7f34a;
-  --lime-light: #d4ff72;
-
-  --glass: rgba(255,255,255,0.08);
-  --glass-border: rgba(255,255,255,0.14);
-
-  --text-main: #ffffff;
-  --text-secondary: #d9cfee;
-
-  --shadow-purple:
-    0 0 35px rgba(124,58,237,0.30);
-
-  --shadow-lime:
-    0 0 25px rgba(183,243,74,0.18);
-}
-
-
-/* =========================================================
-   BODY
-   ========================================================= */
-
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-
-  width: 100%;
-  height: 100%;
-
-  margin: 0;
-  padding: 0;
-
-  overflow: hidden;
-}
-
-body {
-
-  font-family:
-    Arial,
-    Tahoma,
-    sans-serif;
-
-  color: var(--text-main);
-
-  background:
-
-    radial-gradient(
-      circle at 15% 15%,
-      rgba(124,58,237,0.30),
-      transparent 35%
-    ),
-
-    radial-gradient(
-      circle at 85% 85%,
-      rgba(183,243,74,0.13),
-      transparent 32%
-    ),
-
-    linear-gradient(
-      135deg,
-      var(--bg-main),
-      var(--bg-secondary)
-    );
-
-  transition:
-    background 0.35s ease,
-    color 0.35s ease;
-}
-
-
-/* =========================================================
-   LIGHT / DAY MODE
-   ========================================================= */
-
-body.light {
-
-  --bg-main: #170725;
-  --bg-secondary: #2a1042;
-
-  --purple: #7c3aed;
-  --purple-light: #a855f7;
-
-  --lime: #b7f34a;
-  --lime-light: #d4ff72;
-
-  --glass: rgba(255,255,255,0.10);
-  --glass-border: rgba(255,255,255,0.18);
-
-  --text-main: #ffffff;
-  --text-secondary: #eadfff;
-
-  background:
-
-    radial-gradient(
-      circle at 15% 15%,
-      rgba(168,85,247,0.40),
-      transparent 38%
-    ),
-
-    radial-gradient(
-      circle at 85% 85%,
-      rgba(183,243,74,0.24),
-      transparent 35%
-    ),
-
-    linear-gradient(
-      135deg,
-      #160621,
-      #32114b
-    );
-}
-
-
-/* =========================================================
-   NIGHT MODE
-   ========================================================= */
-
-body:not(.light) {
-
-  --bg-main: #030107;
-  --bg-secondary: #08030d;
-
-  --purple: #54208f;
-  --purple-light: #7437a8;
-
-  --lime: #6d8f2b;
-  --lime-light: #8eaf42;
-
-  --glass: rgba(255,255,255,0.045);
-  --glass-border: rgba(255,255,255,0.08);
-
-  --text-main: #eeeeee;
-  --text-secondary: #aaa0b5;
-
-  background:
-
-    radial-gradient(
-      circle at 15% 15%,
-      rgba(84,32,143,0.22),
-      transparent 35%
-    ),
-
-    radial-gradient(
-      circle at 85% 85%,
-      rgba(109,143,43,0.10),
-      transparent 32%
-    ),
-
-    linear-gradient(
-      135deg,
-      #030107,
-      #09040d
-    );
-}
-
-
-/* =========================================================
-   MAIN CONTAINER
-   ========================================================= */
-
-.app {
-
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  padding: 20px;
-}
-
-
-/* =========================================================
-   BOOK WRAPPER
-   ========================================================= */
-
-.book-wrap {
-
-  width: min(1250px, 99vw);
-  height: min(78vh, 760px);
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  position: relative;
-}
-
-
-/* =========================================================
-   BOOK
-   ========================================================= */
-
-.book {
-
-  width: 100%;
-  height: 100%;
-
-  background: #ffffff;
-
-  border-radius: 18px;
-
-  overflow: hidden;
-
-  box-shadow:
-    var(--shadow-purple),
-    0 20px 70px rgba(0,0,0,0.45);
-
-  position: relative;
-}
-
-
-/* =========================================================
-   PAGE
-   ========================================================= */
-
-.page-inner {
-
-  width: 100%;
-  height: 100%;
-
-  padding: 1px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  background: #ffffff;
-
-  overflow: hidden;
-}
-
-
-/* =========================================================
-   PDF CANVAS
-   ========================================================= */
-
-#pdfCanvas {
-
-  display: block;
-
-  max-width: 100%;
-  max-height: 100%;
-
-  background: #ffffff;
-}
-
-
-/* =========================================================
-   LOADING
-   ========================================================= */
-
-#loading {
-
-  position: absolute;
-
-  inset: 0;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  background:
-    rgba(10,5,20,0.25);
-
-  color: #ffffff;
-
-  font-size: 15px;
-
-  z-index: 5;
-
-  pointer-events: none;
-}
-
-
-/* =========================================================
-   BOTTOM CONTROL PANEL
-   ========================================================= */
-
-.controls {
-
-  width: min(1250px, 99vw);
-
-  margin-top: 14px;
-
-  padding: 10px 14px;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-  border-radius: 16px;
-
-  background: var(--glass);
-
-  border: 1px solid var(--glass-border);
-
-  backdrop-filter: blur(18px);
-
-  -webkit-backdrop-filter: blur(18px);
-
-  box-shadow:
-    0 10px 35px rgba(0,0,0,0.22);
-}
-
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
-
-.control-button {
-
-  border: 1px solid var(--glass-border);
-
-  background: rgba(255,255,255,0.07);
-
-  color: var(--text-main);
-
-  width: 42px;
-  height: 38px;
-
-  border-radius: 10px;
-
-  cursor: pointer;
-
-  font-size: 17px;
-
-  transition:
-    0.2s ease;
-}
-
-
-.control-button:hover {
-
-  background: var(--purple);
-
-  border-color: var(--purple-light);
-
-  box-shadow:
-    0 0 16px rgba(124,58,237,0.35);
-}
-
-
-.control-button:disabled {
-
-  opacity: 0.35;
-
-  cursor: default;
-
-  box-shadow: none;
-}
-
-
-/* =========================================================
-   PROGRESS SLIDER
-   ========================================================= */
-
-#progress {
-
-  flex: 1;
-
-  accent-color: var(--lime);
-
-  cursor: pointer;
-}
-
-
-/* =========================================================
-   PAGE COUNTER
-   ========================================================= */
-
-.page-counter {
-
-  min-width: 65px;
-
-  text-align: center;
-
-  font-size: 14px;
-
-  color: var(--text-secondary);
-
-  direction: ltr;
-}
-
-
-/* =========================================================
-   THEME BUTTON
-   ========================================================= */
-
-#themeButton {
-
-  color: var(--lime);
-
-  border-color:
-    rgba(183,243,74,0.25);
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 700px) {
-
-  .app {
-
-    padding: 10px;
-  }
-
-  .book-wrap {
-
-    width: 100%;
-
-    height: calc(100vh - 105px);
-  }
-
-  .book {
-
-    border-radius: 12px;
-  }
-
-  .controls {
-
-    width: 100%;
-
-    padding: 8px;
-
-    margin-top: 8px;
-
-    gap: 6px;
-
-    border-radius: 12px;
-  }
-
-  .control-button {
-
-    width: 38px;
-    height: 36px;
-
-    font-size: 15px;
-  }
-
-  .page-counter {
-
-    min-width: 55px;
-
-    font-size: 12px;
-  }
-}
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Digital Book</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    :root {
+      --bg1: #17102f;
+      --bg2: #24134b;
+      --purple: #8b5cf6;
+      --purple2: #6d28d9;
+      --lime: #b7f34a;
+      --text: #ffffff;
+      --glass: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.14);
+      --shadow: rgba(0,0,0,0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(139,92,246,0.28), transparent 35%),
+        radial-gradient(circle at 80% 90%, rgba(183,243,74,0.10), transparent 35%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body.night {
+      --bg1: #050309;
+      --bg2: #10071f;
+      --purple: #4c288e;
+      --purple2: #32155f;
+      --lime: #617c25;
+      --glass: rgba(255,255,255,0.045);
+      --glass-border: rgba(255,255,255,0.08);
+      --shadow: rgba(0,0,0,0.65);
+
+      background:
+        radial-gradient(circle at 20% 10%, rgba(76,40,142,0.22), transparent 35%),
+        radial-gradient(circle at 80% 90%, rgba(97,124,37,0.07), transparent 35%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .page {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .book-wrap {
+      width: min(1250px, 99vw);
+      height: min(78vh, 760px);
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .book {
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow:
+        0 25px 70px var(--shadow),
+        0 0 0 1px rgba(255,255,255,0.12);
+      position: relative;
+    }
+
+    .page-inner {
+      width: 100%;
+      height: 100%;
+      padding: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+    }
+
+    #pdfCanvas {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      background: white;
+    }
+
+    .loading {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20,10,45,0.88);
+      backdrop-filter: blur(8px);
+      color: white;
+      font-size: 18px;
+    }
+
+    .loading.hidden {
+      display: none;
+    }
+
+    .spinner {
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(255,255,255,0.25);
+      border-top-color: var(--lime);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 12px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .controls {
+      width: min(1250px, 99vw);
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 15px 40px var(--shadow);
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      color: white;
+      background: var(--purple2);
+      border-radius: 10px;
+      min-width: 42px;
+      height: 40px;
+      font-size: 18px;
+      transition: 0.2s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--purple);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .theme-btn {
+      margin-right: auto;
+      min-width: 42px;
+    }
+
+    .counter {
+      min-width: 75px;
+      text-align: center;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    #progress {
+      flex: 1;
+      accent-color: var(--lime);
+      cursor: pointer;
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        padding: 8px;
+      }
+
+      .book-wrap {
+        width: 100%;
+        height: calc(100vh - 115px);
+        min-height: 300px;
+      }
+
+      .book {
+        border-radius: 10px;
+      }
+
+      .controls {
+        width: 100%;
+        margin-top: 8px;
+        padding: 8px;
+        gap: 7px;
+      }
+
+      button {
+        min-width: 38px;
+        height: 36px;
+      }
+
+      .counter {
+        min-width: 58px;
+        font-size: 12px;
+      }
+    }
+  </style>
 
 </head>
 
-
 <body>
 
-<div class="app">
+  <main class="page">
 
+```
+<div class="book-wrap">
+  <div class="book">
 
-  <!-- =====================================================
-       BOOK
-       ===================================================== -->
+    <div class="page-inner">
+      <canvas id="pdfCanvas"></canvas>
+    </div>
 
-  <div class="book-wrap">
-
-    <div class="book">
-
-      <div class="page-inner" id="content">
-
-        <canvas id="pdfCanvas"></canvas>
-
-      </div>
-
-      <div id="loading">
-        در حال بارگذاری PDF...
-      </div>
-
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <span>در حال بارگذاری کتاب...</span>
     </div>
 
   </div>
-
-
-  <!-- =====================================================
-       CONTROL PANEL
-       ===================================================== -->
-
-  <div class="controls">
-
-
-    <!-- Previous -->
-    <button
-      class="control-button"
-      id="prev"
-      title="صفحه قبل"
-    >
-      ‹
-    </button>
-
-
-    <!-- Progress -->
-    <input
-      type="range"
-      id="progress"
-      min="1"
-      max="1"
-      value="1"
-    >
-
-
-    <!-- Next -->
-    <button
-      class="control-button"
-      id="next"
-      title="صفحه بعد"
-    >
-      ›
-    </button>
-
-
-    <!-- Page counter -->
-    <div class="page-counter">
-
-      <span id="current">
-        1
-      </span>
-
-      /
-
-      <span id="total">
-        -
-      </span>
-
-    </div>
-
-
-    <!-- Day / Night -->
-    <button
-      class="control-button"
-      id="themeButton"
-      title="حالت روز / شب"
-    >
-      ☀
-    </button>
-
-  </div>
-
 </div>
 
+<div class="controls">
 
-<script>
+  <button id="prevBtn" title="صفحه قبل">
+    ‹
+  </button>
 
-/* =========================================================
-   PDF SETTINGS
-   ========================================================= */
+  <input
+    id="progress"
+    type="range"
+    min="1"
+    max="1"
+    value="1"
+  >
 
-/*
-  فقط همین قسمت را برای انتخاب نسخه تغییر بده.
+  <div class="counter">
+    <span id="current">1</span>
+    /
+    <span id="total">0</span>
+  </div>
 
-  PC:
-  const BOOK_TYPE = "PC";
+  <button id="nextBtn" title="صفحه بعد">
+    ›
+  </button>
 
-  Phone:
-  const BOOK_TYPE = "PHONE";
-*/
+  <button
+    id="themeBtn"
+    class="theme-btn"
+    title="حالت شب / روز"
+  >
+    ☾
+  </button>
 
-const BOOK_TYPE = "PC";
+</div>
+```
 
+  </main>
 
-/* =========================================================
-   PDF PATH
-   ========================================================= */
+  <script>
 
-const PDF_URL =
-  BOOK_TYPE === "PHONE"
+    /*
+      ==========================================
+      نوع کتاب
+      ==========================================
 
-    ? "https://mohammabali126-hash.github.io/digital-book/ppt/Phone/phone.pdf"
+      PC:
+      ppt/PC/pc.pdf
 
-    : "https://mohammabali126-hash.github.io/digital-book/ppt/PC/pc.pdf";
+      PHONE:
+      ppt/Phone/phone.pdf
 
+      فقط همین مقدار را تغییر بده.
+    */
 
-/* =========================================================
-   PDF.JS WORKER
-   ========================================================= */
-
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-
-/* =========================================================
-   VARIABLES
-   ========================================================= */
-
-let pdfDocument = null;
-
-let currentPage = 1;
-
-/*
-  این مقدار از خود PDF گرفته می‌شود.
-  هیچ تعداد صفحه‌ای به صورت دستی وارد نشده است.
-*/
-let totalPages = 0;
-
-
-/* =========================================================
-   DOM ELEMENTS
-   ========================================================= */
-
-const canvas =
-  document.getElementById("pdfCanvas");
-
-const ctx =
-  canvas.getContext("2d");
-
-const content =
-  document.getElementById("content");
-
-const loading =
-  document.getElementById("loading");
-
-const prev =
-  document.getElementById("prev");
-
-const next =
-  document.getElementById("next");
-
-const progress =
-  document.getElementById("progress");
-
-const current =
-  document.getElementById("current");
-
-const total =
-  document.getElementById("total");
-
-const themeButton =
-  document.getElementById("themeButton");
-
-
-/* =========================================================
-   LOAD PDF
-   ========================================================= */
-
-async function loadPDF() {
-
-  try {
-
-    loading.style.display = "flex";
-
-    loading.textContent =
-      "در حال بارگذاری PDF...";
+    const BOOK_TYPE = "PC";
 
 
     /*
-      PDF را دریافت می‌کنیم.
+      ==========================================
+      آدرس PDF
+      ==========================================
     */
 
-    pdfDocument =
-      await pdfjsLib
-        .getDocument(PDF_URL)
-        .promise;
+    const PDF_URL =
+      BOOK_TYPE === "PHONE"
+        ? "https://mohammabali126-hash.github.io/digital-book/ppt/Phone/phone.pdf"
+        : "https://mohammabali126-hash.github.io/digital-book/ppt/PC/pc.pdf";
 
 
     /*
-      تعداد صفحات مستقیماً
-      از خود PDF خوانده می‌شود.
+      ==========================================
+      PDF.js
+      ==========================================
     */
 
-    totalPages =
-      pdfDocument.numPages;
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 
     /*
-      نمایش تعداد صفحات واقعی
-      در پایین صفحه.
+      ==========================================
+      عناصر صفحه
+      ==========================================
     */
 
-    total.textContent =
-      totalPages;
+    const canvas =
+      document.getElementById("pdfCanvas");
+
+    const ctx =
+      canvas.getContext("2d");
+
+    const loading =
+      document.getElementById("loading");
+
+    const progress =
+      document.getElementById("progress");
+
+    const current =
+      document.getElementById("current");
+
+    const total =
+      document.getElementById("total");
+
+    const prevBtn =
+      document.getElementById("prevBtn");
+
+    const nextBtn =
+      document.getElementById("nextBtn");
+
+    const themeBtn =
+      document.getElementById("themeBtn");
 
 
     /*
-      تنظیم Slider بر اساس
-      تعداد واقعی صفحات.
+      ==========================================
+      وضعیت PDF
+      ==========================================
     */
 
-    progress.min = 1;
+    let pdfDocument = null;
 
-    progress.max =
-      totalPages;
+    let currentPage = 1;
 
-    progress.value = 1;
+    let totalPages = 0;
+
+    let rendering = false;
+
+    let pendingPage = null;
 
 
     /*
-      نمایش صفحه اول.
+      ==========================================
+      بارگذاری PDF
+      ==========================================
     */
 
-    await showPage(1);
+    async function loadPDF() {
 
-  }
+      try {
 
-  catch (error) {
+        loading.classList.remove("hidden");
 
-    loading.style.display = "flex";
+        pdfDocument =
+          await pdfjsLib
+            .getDocument(PDF_URL)
+            .promise;
 
-    loading.textContent =
-      "خطا در بارگذاری PDF";
+        /*
+          تعداد صفحات کاملاً خودکار
+          از خود PDF خوانده می‌شود.
+        */
 
-    console.error(error);
+        totalPages =
+          pdfDocument.numPages;
 
-  }
+        total.textContent =
+          totalPages;
 
-}
+        progress.min = 1;
 
+        progress.max =
+          totalPages;
 
-/* =========================================================
-   SHOW PAGE
-   ========================================================= */
+        progress.value = 1;
 
-async function showPage(pageNumber) {
+        currentPage = 1;
 
-  if (!pdfDocument) {
-    return;
-  }
+        await showPage(1);
 
+        loading.classList.add("hidden");
 
-  /*
-    جلوگیری از خارج شدن شماره صفحه
-    از محدوده PDF.
-  */
+      } catch (error) {
 
-  if (pageNumber < 1) {
+        console.error(error);
 
-    pageNumber = 1;
+        loading.innerHTML =
+          "خطا در بارگذاری PDF";
 
-  }
-
-
-  if (pageNumber > totalPages) {
-
-    pageNumber =
-      totalPages;
-
-  }
-
-
-  currentPage =
-    pageNumber;
-
-
-  /*
-    بروزرسانی اطلاعات پایین صفحه.
-  */
-
-  current.textContent =
-    currentPage;
-
-  progress.value =
-    currentPage;
-
-
-  /*
-    فعال / غیرفعال کردن دکمه‌ها.
-  */
-
-  prev.disabled =
-    currentPage === 1;
-
-  next.disabled =
-    currentPage === totalPages;
-
-
-  /*
-    نمایش Loading.
-  */
-
-  loading.style.display =
-    "flex";
-
-  loading.textContent =
-    "در حال نمایش صفحه " +
-    currentPage +
-    "...";
-
-
-  try {
-
-    /*
-      گرفتن صفحه واقعی PDF
-    */
-
-    const page =
-      await pdfDocument.getPage(
-        currentPage
-      );
-
-
-    /*
-      اندازه اصلی صفحه
-    */
-
-    const baseViewport =
-      page.getViewport({
-        scale: 1
-      });
-
-
-    /*
-      فضای قابل استفاده داخل قاب
-    */
-
-    const availableWidth =
-      content.clientWidth - 2;
-
-    const availableHeight =
-      content.clientHeight - 2;
-
-
-    /*
-      محاسبه Scale برای
-      قرار گرفتن کامل صفحه داخل قاب
-    */
-
-    const scaleX =
-      availableWidth /
-      baseViewport.width;
-
-    const scaleY =
-      availableHeight /
-      baseViewport.height;
-
-
-    const scale =
-      Math.min(
-        scaleX,
-        scaleY
-      );
-
-
-    /*
-      Viewport نهایی
-    */
-
-    const viewport =
-      page.getViewport({
-        scale: scale
-      });
-
-
-    /*
-      کیفیت نمایش روی موبایل و
-      نمایشگرهای High-DPI
-    */
-
-    const deviceScale =
-      window.devicePixelRatio || 1;
-
-
-    canvas.width =
-      Math.floor(
-        viewport.width *
-        deviceScale
-      );
-
-    canvas.height =
-      Math.floor(
-        viewport.height *
-        deviceScale
-      );
-
-
-    /*
-      اندازه ظاهری Canvas
-    */
-
-    canvas.style.width =
-      viewport.width + "px";
-
-    canvas.style.height =
-      viewport.height + "px";
-
-
-    /*
-      تنظیم Resolution
-    */
-
-    ctx.setTransform(
-      deviceScale,
-      0,
-      0,
-      deviceScale,
-      0,
-      0
-    );
-
-
-    /*
-      Render صفحه PDF
-    */
-
-    await page.render({
-
-      canvasContext: ctx,
-
-      viewport: viewport
-
-    }).promise;
-
-
-    /*
-      پایان Loading
-    */
-
-    loading.style.display =
-      "none";
-
-  }
-
-  catch (error) {
-
-    loading.style.display =
-      "flex";
-
-    loading.textContent =
-      "خطا در نمایش صفحه";
-
-    console.error(error);
-
-  }
-
-}
-
-
-/* =========================================================
-   PREVIOUS BUTTON
-   ========================================================= */
-
-prev.addEventListener(
-  "click",
-  function() {
-
-    showPage(
-      currentPage - 1
-    );
-
-  }
-);
-
-
-/* =========================================================
-   NEXT BUTTON
-   ========================================================= */
-
-next.addEventListener(
-  "click",
-  function() {
-
-    showPage(
-      currentPage + 1
-    );
-
-  }
-);
-
-
-/* =========================================================
-   SLIDER
-   ========================================================= */
-
-progress.addEventListener(
-  "input",
-  function() {
-
-    showPage(
-      Number(this.value)
-    );
-
-  }
-);
-
-
-/* =========================================================
-   KEYBOARD
-   ========================================================= */
-
-document.addEventListener(
-  "keydown",
-  function(event) {
-
-    if (
-      event.key === "ArrowLeft" ||
-      event.key === "ArrowUp"
-    ) {
-
-      showPage(
-        currentPage - 1
-      );
-
-    }
-
-
-    if (
-      event.key === "ArrowRight" ||
-      event.key === "ArrowDown"
-    ) {
-
-      showPage(
-        currentPage + 1
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   SWIPE
-   ========================================================= */
-
-let touchStartX = 0;
-
-
-content.addEventListener(
-  "touchstart",
-  function(event) {
-
-    touchStartX =
-      event.changedTouches[0]
-        .screenX;
-
-  },
-  {
-    passive: true
-  }
-);
-
-
-content.addEventListener(
-  "touchend",
-  function(event) {
-
-    const touchEndX =
-      event.changedTouches[0]
-        .screenX;
-
-
-    const difference =
-      touchEndX -
-      touchStartX;
-
-
-    /*
-      حرکت خیلی کوچک
-      Swipe محسوب نمی‌شود.
-    */
-
-    if (
-      Math.abs(difference) < 50
-    ) {
-
-      return;
+      }
 
     }
 
 
     /*
-      Swipe به چپ
-      صفحه بعد
+      ==========================================
+      نمایش صفحه
+      ==========================================
     */
 
-    if (difference < 0) {
+    async function showPage(pageNumber) {
 
-      showPage(
-        currentPage + 1
-      );
+      if (!pdfDocument) {
+        return;
+      }
 
-    }
+      pageNumber =
+        Math.max(
+          1,
+          Math.min(pageNumber, totalPages)
+        );
 
+      if (rendering) {
 
-    /*
-      Swipe به راست
-      صفحه قبل
-    */
+        pendingPage =
+          pageNumber;
 
-    else {
+        return;
 
-      showPage(
-        currentPage - 1
-      );
+      }
 
-    }
+      rendering = true;
 
-  },
-  {
-    passive: true
-  }
-);
+      currentPage =
+        pageNumber;
 
+      current.textContent =
+        currentPage;
 
-/* =========================================================
-   DAY / NIGHT
-   ========================================================= */
+      progress.value =
+        currentPage;
 
-let isLight = true;
+      prevBtn.disabled =
+        currentPage <= 1;
 
+      nextBtn.disabled =
+        currentPage >= totalPages;
 
-themeButton.addEventListener(
-  "click",
-  function() {
+      try {
 
-    isLight =
-      !isLight;
+        const page =
+          await pdfDocument.getPage(currentPage);
 
+        const container =
+          document.querySelector(".page-inner");
 
-    document.body.classList.toggle(
-      "light",
-      isLight
-    );
+        const availableWidth =
+          container.clientWidth - 2;
 
+        const availableHeight =
+          container.clientHeight - 2;
 
-    themeButton.textContent =
-      isLight
-        ? "☀"
-        : "🌙";
+        const viewport =
+          page.getViewport({
+            scale: 1
+          });
 
-  }
-);
-
-
-/* =========================================================
-   RESIZE
-   ========================================================= */
-
-let resizeTimer;
-
-
-window.addEventListener(
-  "resize",
-  function() {
-
-    clearTimeout(
-      resizeTimer
-    );
-
-
-    resizeTimer =
-      setTimeout(
-        function() {
-
-          showPage(
-            currentPage
+        const scale =
+          Math.min(
+            availableWidth / viewport.width,
+            availableHeight / viewport.height
           );
 
-        },
-        200
-      );
+        const devicePixelRatio =
+          window.devicePixelRatio || 1;
 
-  }
-);
+        const renderViewport =
+          page.getViewport({
+            scale:
+              scale * devicePixelRatio
+          });
+
+        canvas.width =
+          Math.floor(renderViewport.width);
+
+        canvas.height =
+          Math.floor(renderViewport.height);
+
+        canvas.style.width =
+          Math.floor(viewport.width * scale) + "px";
+
+        canvas.style.height =
+          Math.floor(viewport.height * scale) + "px";
+
+        await page.render({
+          canvasContext: ctx,
+          viewport: renderViewport
+        }).promise;
+
+      } catch (error) {
+
+        console.error(
+          "Page render error:",
+          error
+        );
+
+      } finally {
+
+        rendering = false;
+
+        if (pendingPage !== null) {
+
+          const nextPage =
+            pendingPage;
+
+          pendingPage = null;
+
+          showPage(nextPage);
+
+        }
+
+      }
+
+    }
 
 
-/* =========================================================
-   START
-   ========================================================= */
+    /*
+      ==========================================
+      دکمه صفحه قبل
+      ==========================================
+    */
 
-loadPDF();
+    prevBtn.addEventListener(
+      "click",
+      () => {
 
-</script>
+        if (currentPage > 1) {
+          showPage(currentPage - 1);
+        }
+
+      }
+    );
+
+
+    /*
+      ==========================================
+      دکمه صفحه بعد
+      ==========================================
+    */
+
+    nextBtn.addEventListener(
+      "click",
+      () => {
+
+        if (currentPage < totalPages) {
+          showPage(currentPage + 1);
+        }
+
+      }
+    );
+
+
+    /*
+      ==========================================
+      Slider
+      ==========================================
+    */
+
+    progress.addEventListener(
+      "input",
+      () => {
+
+        showPage(
+          Number(progress.value)
+        );
+
+      }
+    );
+
+
+    /*
+      ==========================================
+      کیبورد
+      ==========================================
+    */
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+
+        if (
+          event.key === "ArrowLeft" ||
+          event.key === "ArrowUp"
+        ) {
+
+          if (currentPage > 1) {
+            showPage(currentPage - 1);
+          }
+
+        }
+
+        if (
+          event.key === "ArrowRight" ||
+          event.key === "ArrowDown"
+        ) {
+
+          if (currentPage < totalPages) {
+            showPage(currentPage + 1);
+          }
+
+        }
+
+      }
+    );
+
+
+    /*
+      ==========================================
+      Swipe موبایل
+      ==========================================
+    */
+
+    let touchStartX = 0;
+
+    let touchEndX = 0;
+
+    canvas.addEventListener(
+      "touchstart",
+      (event) => {
+
+        touchStartX =
+          event.changedTouches[0].screenX;
+
+      },
+      { passive: true }
+    );
+
+    canvas.addEventListener(
+      "touchend",
+      (event) => {
+
+        touchEndX =
+          event.changedTouches[0].screenX;
+
+        const distance =
+          touchEndX - touchStartX;
+
+        if (Math.abs(distance) < 50) {
+          return;
+        }
+
+        /*
+          در حالت RTL:
+          کشیدن به چپ = صفحه بعد
+          کشیدن به راست = صفحه قبل
+        */
+
+        if (distance < 0) {
+
+          if (currentPage < totalPages) {
+            showPage(currentPage + 1);
+          }
+
+        } else {
+
+          if (currentPage > 1) {
+            showPage(currentPage - 1);
+          }
+
+        }
+
+      },
+      { passive: true }
+    );
+
+
+    /*
+      ==========================================
+      حالت شب / روز
+      ==========================================
+    */
+
+    let isNight =
+      localStorage.getItem("digitalBookNight") === "true";
+
+    if (isNight) {
+
+      document.body.classList.add("night");
+
+      themeBtn.textContent = "☀";
+
+    }
+
+
+    themeBtn.addEventListener(
+      "click",
+      () => {
+
+        isNight =
+          !isNight;
+
+        document.body.classList.toggle(
+          "night",
+          isNight
+        );
+
+        themeBtn.textContent =
+          isNight ? "☀" : "☾";
+
+        localStorage.setItem(
+          "digitalBookNight",
+          isNight
+        );
+
+      }
+    );
+
+
+    /*
+      ==========================================
+      تغییر اندازه پنجره
+      ==========================================
+    */
+
+    let resizeTimer;
+
+    window.addEventListener(
+      "resize",
+      () => {
+
+        clearTimeout(resizeTimer);
+
+        resizeTimer =
+          setTimeout(
+            () => {
+
+              showPage(currentPage);
+
+            },
+            150
+          );
+
+      }
+    );
+
+
+    /*
+      ==========================================
+      شروع
+      ==========================================
+    */
+
+    loadPDF();
+
+  </script>
 
 </body>
 </html>
