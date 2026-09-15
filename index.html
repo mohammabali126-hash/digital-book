@@ -1486,9 +1486,12 @@ async function loadPDF(
 
 
         pdfDocument =
-            await pdfjsLib
-                .getDocument(pdfURL)
-                .promise;
+    await pdfjsLib
+        .getDocument({
+            url: pdfURL,
+            disableFontFace: true
+        })
+        .promise;
 
 
         totalPages =
